@@ -1,0 +1,19 @@
+.main-logo {
+  display: flex;
+  width: min-content;
+  align-items: center;
+}
+
+.main-logo:hover {
+  cursor: pointer;
+}
+
+.main-logo > * {
+  margin: 0;
+  display: inline-block;
+}
+
+.main-logo .emoji {
+  margin-right: 1rem;
+  font-size: 2.5rem;
+}
