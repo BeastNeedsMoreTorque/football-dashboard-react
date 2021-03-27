@@ -1,4 +1,6 @@
 .main-display {
-  flex-grow: 1;
-  padding: 1rem 2rem;
+  position: absolute;
+  left: 300px;
+  width: calc(100% - 300px);
+  padding: 1rem 4rem 3rem;
 }

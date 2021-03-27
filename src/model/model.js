@@ -155,7 +155,7 @@ export const model = {
     // find index
     let index = 0;
     for (const player of topScorers) {
-      if (player.goals.overall < topScorers[MAX_TOP_SCORERS].goals.overall)
+      if (player.goals.overall < topScorers[MAX_TOP_SCORERS - 1].goals.overall)
         break;
       index++;
     }

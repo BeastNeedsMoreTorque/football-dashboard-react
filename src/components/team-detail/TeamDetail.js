@@ -7,9 +7,13 @@ const propTypes = {
   name: PropTypes.string.isRequired,
   short_code: PropTypes.string.isRequired,
   logo: PropTypes.string.isRequired,
+  displayCode: PropTypes.bool,
+};
+const defaultProps = {
+  displayCode: false,
 };
 
-function TeamDetail({ team_id, name, short_code, logo }) {
+function TeamDetail({ team_id, name, short_code, logo, displayCode }) {
   return (
     <div
       className="team-detail"
@@ -20,13 +24,14 @@ function TeamDetail({ team_id, name, short_code, logo }) {
         className="team-logo"
         src={logo}
         alt={`Logo of ${name}`}
-        title={short_code}
+        title={name}
       />
-      <div className="team-name">{name}</div>
+      <div className="team-name">{displayCode ? short_code : name}</div>
     </div>
   );
 }
 
 TeamDetail.propTypes = propTypes;
+TeamDetail.defaultProps = defaultProps;
 
 export default TeamDetail;

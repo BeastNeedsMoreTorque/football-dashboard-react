@@ -11,6 +11,8 @@ import LeagueDetail from "./league-detail/LeagueDetail";
 import TeamDetail from "./team-detail/TeamDetail";
 import MainDisplay from "./main-display/MainDisplay";
 import MainHeader from "./main-header/MainHeader";
+import MainContent from "./main-content/MainContent";
+import ContentGrid from "./content-grid/ContentGrid";
 
 class App extends React.Component {
   state = {
@@ -18,13 +20,23 @@ class App extends React.Component {
     navLoading: true,
     navLeagues: [],
     navTeams: [],
+    contentData: [],
   };
 
   onClickLeague = async (e) => {
-    this.setState({ navLoading: true });
     const { leagueId, seasonId } = e.target
       .closest(".item")
       .querySelector(".league-detail").dataset;
+
+    this.setState({
+      navLoading: true,
+      contentData: [
+        { type: "standings", data: null },
+        { type: "matches", subType: "Result", data: null },
+        { type: "matches", subType: "Upcoming", data: null },
+        { type: "topScorers", data: null },
+      ],
+    });
 
     model
       .getLeagueName(leagueId)
@@ -32,14 +44,35 @@ class App extends React.Component {
 
     const standingsData = await model.getStandingsData(leagueId, seasonId);
     const {
+      teamsData,
       teamsDataArr,
-      // teamsData,
-      // teamsDataByName,
+      teamsDataByName,
     } = await model.getTeamsData(leagueId, standingsData);
 
+    const currentData = this.state.contentData.map((v) => {
+      return { ...v };
+    });
+    currentData[0].data = { standingsData, teamsData };
+
     this.setState({
-      navTeams: teamsDataArr,
       navLoading: false,
+      navTeams: teamsDataArr,
+      contentData: currentData,
+    });
+
+    model.getMatchResultsData(leagueId, seasonId).then((matchesData) => {
+      currentData[1].data = { matchesData, teamsDataByName };
+      this.setState({ contentData: currentData });
+    });
+
+    model.getMatchUpcomingData(leagueId, seasonId).then((matchesData) => {
+      currentData[2].data = { matchesData, teamsDataByName };
+      this.setState({ contentData: currentData });
+    });
+
+    model.getTopScorersData(leagueId, seasonId).then((topScorersData) => {
+      currentData[3].data = { topScorersData, teamsDataByName };
+      this.setState({ contentData: currentData });
     });
   };
 
@@ -101,6 +134,9 @@ class App extends React.Component {
         </Sidebar>
         <MainDisplay>
           <MainHeader title={this.state.headerTitle} />
+          <MainContent>
+            <ContentGrid contentData={this.state.contentData} />
+          </MainContent>
         </MainDisplay>
       </div>
     );
