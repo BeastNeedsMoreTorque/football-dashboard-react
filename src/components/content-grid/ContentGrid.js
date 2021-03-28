@@ -9,7 +9,7 @@ const propTypes = {
 
 function ContentGrid({ contentData }) {
   return (
-    <Grid columns={2}>
+    <Grid>
       {contentData.map(({ type, subType, data }, i) => (
         <ContentCard key={i} type={type} subType={subType} data={data} />
       ))}

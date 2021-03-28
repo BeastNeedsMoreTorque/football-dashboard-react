@@ -14,18 +14,19 @@ const defaultProps = { subType: "" };
 
 const cardConfig = {
   standings: {
-    style: { width: "100%" },
+    width: 16,
     title: "Standings",
     dummyLength: 15,
     Detail: StandingsDetail,
   },
   matches: {
+    width: 8,
     title: "Match",
     dummyLength: 10,
     Detail: MatchesDetail,
   },
   topScorers: {
-    style: { width: "100%" },
+    width: 16,
     title: "Top Scorers",
     dummyLength: 10,
     Detail: TopScorersDetail,
@@ -33,10 +34,10 @@ const cardConfig = {
 };
 
 function ContentCard({ type, subType, data }) {
-  const { style, title, dummyLength, Detail } = cardConfig[type];
+  const { width, title, dummyLength, Detail } = cardConfig[type];
 
   return (
-    <Grid.Column style={style}>
+    <Grid.Column width={width}>
       <Card fluid={true}>
         <Card.Content>
           <Card.Header>{`${title} ${subType}`.trim()}</Card.Header>

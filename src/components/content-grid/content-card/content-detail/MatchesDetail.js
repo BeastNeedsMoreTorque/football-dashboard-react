@@ -39,7 +39,9 @@ function MatchesDetail({ data, subType }) {
         <Table.Header className="header">
           <Table.Row>
             {config[subType].tableHeader.map((text, i) => (
-              <Table.HeaderCell key={i}>{text}</Table.HeaderCell>
+              <Table.HeaderCell width={5} key={i}>
+                {text}
+              </Table.HeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
@@ -58,15 +60,14 @@ function MatchesDetail({ data, subType }) {
                     className={`team-cell home ${
                       homeScore > awayScore ? "winner" : ""
                     }`}
-                    width={3}
                     children={<TeamDetail {...homeTeam} displayCode={true} />}
                   />
                   {subType === "Result" ? (
-                    <Table.Cell className="score" width={3}>
+                    <Table.Cell className="score">
                       {homeScore} - {awayScore}
                     </Table.Cell>
                   ) : (
-                    <Table.Cell className="schedule" width={3}>
+                    <Table.Cell width={6} className="schedule">
                       {match.match_start.split(" ")[1]}
                       <br />
                       <small
@@ -80,7 +81,6 @@ function MatchesDetail({ data, subType }) {
                     className={`team-cell home ${
                       awayScore > homeScore ? "winner" : ""
                     }`}
-                    width={3}
                     children={<TeamDetail {...awayTeam} displayCode={true} />}
                   />
                 </Table.Row>

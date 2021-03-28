@@ -19,10 +19,16 @@ function TopScorersDetail({ data }) {
           <Table.HeaderCell width={1} rowSpan="2">
             #
           </Table.HeaderCell>
-          <Table.HeaderCell rowSpan="2">Team</Table.HeaderCell>
-          <Table.HeaderCell rowSpan="2">Name</Table.HeaderCell>
+          <Table.HeaderCell width={2} rowSpan="2">
+            Team
+          </Table.HeaderCell>
+          <Table.HeaderCell width={4} rowSpan="2">
+            Name
+          </Table.HeaderCell>
           <Table.HeaderCell colSpan="4">Goals</Table.HeaderCell>
-          <Table.HeaderCell rowSpan="2">Played</Table.HeaderCell>
+          <Table.HeaderCell width={3} rowSpan="2">
+            Played
+          </Table.HeaderCell>
           <Table.HeaderCell rowSpan="2">Goal per 90Min</Table.HeaderCell>
         </Table.Row>
         <Table.Row>
@@ -41,17 +47,14 @@ function TopScorersDetail({ data }) {
             <Table.Row key={i}>
               <Table.Cell>{p.pos}</Table.Cell>
               <Table.Cell
-                width={2}
                 children={<TeamDetail {...teamData} displayCode={true} />}
               />
-              <Table.Cell width={4}>
-                {formatName(p.player.player_name)}
-              </Table.Cell>
+              <Table.Cell>{formatName(p.player.player_name)}</Table.Cell>
               <Table.Cell>{p.goals.overall}</Table.Cell>
               <Table.Cell>{p.goals.home}</Table.Cell>
               <Table.Cell>{p.goals.away}</Table.Cell>
               <Table.Cell>{p.penalties || "0"}</Table.Cell>
-              <Table.Cell width={3}>
+              <Table.Cell>
                 {p.matches_played} Games, {p.minutes_played} min
               </Table.Cell>
               <Table.Cell>
