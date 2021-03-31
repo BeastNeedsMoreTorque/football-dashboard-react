@@ -68,6 +68,9 @@ export const model = {
     const teamsDataArr = await Promise.all(
       standingsData.map((team) => api.getTeam(leagueId, team.team_id))
     );
+    teamsDataArr.forEach(
+      (team, i) => (teamsDataArr[i] = Object.assign(team, { leagueId }))
+    );
 
     const teamsData = {};
     const teamsDataByName = {};
@@ -77,6 +80,9 @@ export const model = {
       team.name = formatTeamName(name);
       teamsData[team_id] = team;
       teamsDataByName[name] = team;
+
+      teamsData[team_id].leagueId = leagueId;
+      teamsDataByName[name].leagueId = leagueId;
     });
 
     teamsDataArr.sort((a, b) => a.name.localeCompare(b.name));
@@ -121,11 +127,18 @@ export const model = {
     return matchesSorted;
   },
 
-  async getMatchUpcomingData(leagueId, seasonId, teamCode = null) {
-    const matchesData = await api.getMatchUpcoming(leagueId, seasonId);
+  async getMatchUpcomingData(
+    leagueId,
+    seasonId,
+    isMonth = false,
+    teamCode = null
+  ) {
+    const matchesData = await api.getMatchUpcoming(leagueId, seasonId, isMonth);
 
     // filter status
-    let filtered = matchesData.filter((match) => match.status === "notstarted");
+    let filtered = matchesData.filter(
+      (match) => match.status === "notstarted" || match.status === ""
+    );
 
     // filter by team
     if (teamCode) {

@@ -1,3 +1,8 @@
 .top-scorers-detail .header .goals-overall {
   border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
 }
+
+.top-scorers-detail .team-cell:hover {
+  cursor: pointer;
+  background-color: whitesmoke;
+}

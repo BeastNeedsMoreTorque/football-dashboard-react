@@ -47,6 +47,7 @@ function TopScorersDetail({ data }) {
             <Table.Row key={i}>
               <Table.Cell>{p.pos}</Table.Cell>
               <Table.Cell
+                className="team-cell"
                 children={<TeamDetail {...teamData} displayCode={true} />}
               />
               <Table.Cell>{formatName(p.player.player_name)}</Table.Cell>

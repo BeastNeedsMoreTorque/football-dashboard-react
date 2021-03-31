@@ -17,17 +17,28 @@ import ContentGrid from "./content-grid/ContentGrid";
 class App extends React.Component {
   state = {
     headerTitle: "Welcome To Football Dashboard",
+    currentSeason: {},
     navLoading: true,
     navLeagues: [],
     navTeams: [],
     contentData: [],
   };
 
-  onClickLeague = async (e) => {
-    const { leagueId, seasonId } = e.target
-      .closest(".item")
-      .querySelector(".league-detail").dataset;
+  async componentDidMount() {
+    await api.initCache("sportDataApi");
 
+    const leagues = await model.getLeagueData();
+
+    const currentSeason = {};
+
+    leagues.forEach((league) => {
+      currentSeason[league.league_id] = league.season_id + "";
+    });
+
+    this.setState({ currentSeason, navLeagues: leagues, navLoading: false });
+  }
+
+  onClickLeague = async ({ leagueId, seasonId }) => {
     this.setState({
       navLoading: true,
       contentData: [
@@ -76,13 +87,50 @@ class App extends React.Component {
     });
   };
 
-  async componentDidMount() {
-    await api.initCache("sportDataApi");
+  onClickTeam = async ({ leagueId, teamId, teamCode }) => {
+    const seasonId = this.state.currentSeason[leagueId];
 
-    const leagues = await model.getLeagueData();
+    this.setState({
+      contentData: [
+        { type: "teamStanding", data: null },
+        { type: "teamNextMatch", data: null },
+        { type: "teamForm", data: null },
+      ],
+    });
 
-    this.setState({ navLeagues: leagues, navLoading: false });
-  }
+    model
+      .getTeamName(leagueId, teamId)
+      .then((teamName) => this.setState({ headerTitle: teamName }));
+
+    const standingsData = await model.getStandingsData(leagueId, seasonId);
+    const { teamsData, teamsDataByName } = await model.getTeamsData(
+      leagueId,
+      standingsData
+    );
+
+    const currentData = this.state.contentData.map((v) => {
+      return { ...v };
+    });
+
+    currentData[0].data = { standingsData, teamsData, teamId };
+    this.setState({
+      contentData: currentData,
+    });
+
+    model
+      .getMatchUpcomingData(leagueId, seasonId, true, teamCode)
+      .then((matchesData) => {
+        currentData[1].data = { matchesData, teamsDataByName, teamCode };
+        this.setState({ contentData: currentData });
+      });
+
+    model
+      .getMatchResultsData(leagueId, seasonId, true, teamCode)
+      .then((matchesData) => {
+        currentData[2].data = { matchesData, teamsDataByName, teamCode };
+        this.setState({ contentData: currentData });
+      });
+  };
 
   render() {
     return (
@@ -104,7 +152,14 @@ class App extends React.Component {
                 item={true}
                 disabled={this.state.navLoading}
               >
-                <Dropdown.Menu onClick={this.onClickLeague}>
+                <Dropdown.Menu
+                  onClick={(e) => {
+                    const { leagueId, seasonId } = e.target
+                      .closest(".item")
+                      .querySelector(".league-detail").dataset;
+                    this.onClickLeague({ leagueId, seasonId });
+                  }}
+                >
                   {this.state.navLeagues.map((league) => (
                     <Dropdown.Item key={league.league_id}>
                       <LeagueDetail {...league} />
@@ -121,6 +176,12 @@ class App extends React.Component {
               >
                 <Dropdown.Menu
                   style={{ maxHeight: "300px", overflowY: "scroll" }}
+                  onClick={(e) => {
+                    const { leagueId, teamId, teamCode } = e.target
+                      .closest(".item")
+                      .querySelector(".team-detail").dataset;
+                    this.onClickTeam({ leagueId, teamId, teamCode });
+                  }}
                 >
                   {this.state.navTeams.map((team) => (
                     <Dropdown.Item key={team.team_id}>
@@ -135,7 +196,10 @@ class App extends React.Component {
         <MainDisplay>
           <MainHeader title={this.state.headerTitle} />
           <MainContent>
-            <ContentGrid contentData={this.state.contentData} />
+            <ContentGrid
+              contentData={this.state.contentData}
+              onClickTeam={this.onClickTeam}
+            />
           </MainContent>
         </MainDisplay>
       </div>

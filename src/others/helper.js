@@ -28,14 +28,12 @@ export const formatName = function (name) {
 export const formatDate = function (dateStr) {
   // to make it work on safari
   const date = new Date(dateStr.replaceAll("-", "/"));
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("ko-KR", {
     weekday: "short",
     day: "2-digit",
     month: "short",
     hour12: "true",
     hour: "2-digit",
     minute: "2-digit",
-  })
-    .format(date)
-    .split(", ");
+  }).format(date);
 };

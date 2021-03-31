@@ -63,7 +63,11 @@ function MatchesDetail({ data, subType }) {
                     children={<TeamDetail {...homeTeam} displayCode={true} />}
                   />
                   {subType === "Result" ? (
-                    <Table.Cell className="score">
+                    <Table.Cell
+                      className={`score ${
+                        homeScore === awayScore ? "winner" : ""
+                      }`}
+                    >
                       {homeScore} - {awayScore}
                     </Table.Cell>
                   ) : (

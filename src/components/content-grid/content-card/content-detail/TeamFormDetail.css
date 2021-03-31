@@ -1,0 +1,23 @@
+.team-form-detail .team-cell:hover {
+  cursor: pointer;
+  background-color: whitesmoke;
+}
+
+.team-form-detail .team-cell .team-detail {
+  justify-content: center;
+}
+
+.team-form-detail .header {
+  background-color: #f9fafb;
+  font-weight: bold;
+}
+
+.team-form-detail .won {
+  background-color: lightcyan;
+}
+.team-form-detail .draw {
+  background-color: whitesmoke;
+}
+.team-form-detail .lost {
+  background-color: rgba(255, 240, 240);
+}

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 
 const propTypes = {
   team_id: PropTypes.number.isRequired,
+  leagueId: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   short_code: PropTypes.string.isRequired,
   logo: PropTypes.string.isRequired,
@@ -13,12 +14,20 @@ const defaultProps = {
   displayCode: false,
 };
 
-function TeamDetail({ team_id, name, short_code, logo, displayCode }) {
+function TeamDetail({
+  team_id,
+  leagueId,
+  name,
+  short_code,
+  logo,
+  displayCode,
+}) {
   return (
     <div
       className="team-detail"
       data-team-id={team_id}
       data-team-code={short_code}
+      data-league-id={leagueId}
     >
       <img
         className="team-logo"
