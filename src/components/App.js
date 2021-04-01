@@ -23,6 +23,7 @@ class App extends React.Component {
     navTeams: [],
     contentData: [],
     customData: new Map(),
+    currentPage: "home",
   };
 
   async componentDidMount() {
@@ -35,34 +36,47 @@ class App extends React.Component {
 
   onCustomClick = async () => {
     window.scroll(0, 0);
+    // set header
+    this.setState({ headerTitle: "Custom", currentPage: "custom" });
 
+    // set content
     const nextData = [];
     this.state.customData.forEach((metaData) => {
       nextData.push({ ...metaData, data: null });
     });
 
-    // set content, header
     this.setState({
       contentData: nextData,
-      headerTitle: "Custom",
     });
 
+    // feed data
     nextData.forEach((metaData, index) => {
       let standingsData;
+      let headerData;
       model
         .getStandingsData(metaData.leagueId, metaData.seasonId)
         .then((data) => {
           standingsData = data;
           return model.getTeamsData(metaData.leagueId, standingsData);
         })
-        .then(({ teamsData, teamsDataByName }) =>
-          this.renderContent(
+        .then(async ({ teamsData, teamsDataByName }) => {
+          if (metaData.teamId) headerData = teamsData[metaData.teamId];
+          else {
+            const leagues = await model.getLeagueData();
+            const [leagueData] = leagues.filter(
+              (l) => l.league_id === +metaData.leagueId
+            );
+            headerData = leagueData;
+          }
+          nextData[index].headerData = headerData;
+
+          return this.renderContent(
             metaData,
             index,
             { standingsData, teamsData, teamsDataByName },
             nextData
-          )
-        )
+          );
+        })
         .then(() => this.setState({ contentData: nextData }));
     });
   };
@@ -79,6 +93,7 @@ class App extends React.Component {
         { type: "matches", subType: "upcoming", data: null, ...leagueMetaData },
         { type: "topScorers", data: null, ...leagueMetaData },
       ],
+      currentPage: "league",
     });
 
     // set header
@@ -134,6 +149,7 @@ class App extends React.Component {
         { type: "teamNextMatch", data: null, ...teamMetaData },
         { type: "teamForm", data: null, ...teamMetaData },
       ],
+      currentPage: "team",
     });
 
     // set header
@@ -167,13 +183,13 @@ class App extends React.Component {
   };
 
   renderContent = (card, index, data, renderArr) => {
-    const { leagueId, seasonId, teamId, teamCode } = card;
+    const { leagueId, seasonId, teamCode } = card;
     const { standingsData, teamsData, teamsDataByName } = data;
 
     switch (card.type) {
       case "standings":
       case "teamStanding":
-        renderArr[index].data = { standingsData, teamsData, teamId };
+        renderArr[index].data = { standingsData, teamsData };
         return Promise.resolve();
       case "matches":
       case "teamNextMatch":
@@ -191,7 +207,6 @@ class App extends React.Component {
             (renderArr[index].data = {
               matchesData,
               teamsDataByName,
-              teamCode,
             })
         );
       case "topScorers":
@@ -209,8 +224,8 @@ class App extends React.Component {
 
   onCardToggleChange = (metaData) => {
     const key = generateKey(metaData);
-
     const currentMap = new Map(this.state.customData);
+
     currentMap.has(key)
       ? currentMap.delete(key)
       : currentMap.set(key, { ...metaData });
@@ -290,6 +305,8 @@ class App extends React.Component {
             <ContentGrid
               contentData={this.state.contentData}
               customData={this.state.customData}
+              currentPage={this.state.currentPage}
+              onLeagueClick={this.onLeagueClick}
               onTeamClick={this.onTeamClick}
               onCardToggleChange={this.onCardToggleChange}
             />

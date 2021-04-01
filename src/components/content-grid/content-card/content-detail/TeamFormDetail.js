@@ -7,10 +7,12 @@ import TeamDetail from "../../../team-detail/TeamDetail";
 
 const propTypes = {
   data: PropTypes.object.isRequired,
+  metaData: PropTypes.object.isRequired,
 };
 
-function TeamFormDetail({ data }) {
-  const { matchesData, teamsDataByName, teamCode } = data;
+function TeamFormDetail({ data, metaData }) {
+  const { matchesData, teamsDataByName } = data;
+  const { seasonId, teamCode } = metaData;
 
   const OpponentRow = [
     <Table.Cell key={0} className="header" width={2} children="Opponent" />,
@@ -56,7 +58,11 @@ function TeamFormDetail({ data }) {
 
     OpponentRow.push(
       <Table.Cell key={index + 1} className="team-cell">
-        <TeamDetail {...teamsDataByName[opponentName]} displayCode={true} />
+        <TeamDetail
+          {...teamsDataByName[opponentName]}
+          seasonId={seasonId}
+          displayCode={true}
+        />
       </Table.Cell>
     );
 

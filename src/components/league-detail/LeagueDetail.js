@@ -8,9 +8,10 @@ const propTypes = {
   season_id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   countryName: PropTypes.string.isRequired,
+  size: PropTypes.string,
 };
 
-function LeagueDetail({ league_id, name, season_id, countryName }) {
+function LeagueDetail({ league_id, name, season_id, countryName, size }) {
   return (
     <div
       className="league-detail"
@@ -18,7 +19,16 @@ function LeagueDetail({ league_id, name, season_id, countryName }) {
       data-season-id={season_id}
     >
       <Flag name={countryName.toLowerCase()} />
-      <div className="league-name">{name}</div>
+      <div
+        className="league-name"
+        style={
+          size === "small"
+            ? { marginLeft: "0.2rem", fontSize: "1rem", fontWeight: "normal" }
+            : { marginLeft: "0.5rem" }
+        }
+      >
+        {name}
+      </div>
     </div>
   );
 }

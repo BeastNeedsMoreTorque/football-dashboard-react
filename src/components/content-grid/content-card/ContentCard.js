@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Grid, Card, Placeholder, Checkbox } from "semantic-ui-react";
+import { Grid, Card, Placeholder, Popup, Checkbox } from "semantic-ui-react";
+import LeagueDetail from "../../league-detail/LeagueDetail";
+import TeamDetail from "../../team-detail/TeamDetail";
 import StandingsDetail from "./content-detail/StandingsDetail";
 import MatchesDetail from "./content-detail/MatchesDetail";
 import TopScorersDetail from "./content-detail/TopScorersDetail";
@@ -10,9 +12,12 @@ import TeamFormDetail from "./content-detail/TeamFormDetail";
 import { generateKey } from "../../../others/helper";
 
 const propTypes = {
-  customData: PropTypes.object.isRequired,
   metaData: PropTypes.object.isRequired,
+  customData: PropTypes.object.isRequired,
+  currentPage: PropTypes.string.isRequired,
+  headerData: PropTypes.object,
   data: PropTypes.object,
+  onLeagueClick: PropTypes.func.isRequired,
   onTeamClick: PropTypes.func.isRequired,
   onCardToggleChange: PropTypes.func.isRequired,
 };
@@ -58,19 +63,74 @@ const cardConfig = {
 };
 
 function ContentCard({
-  customData,
   metaData,
+  customData,
+  currentPage,
   data,
+  headerData,
+  onLeagueClick,
   onTeamClick,
   onCardToggleChange,
 }) {
-  const { type, subType, leagueId, seasonId } = metaData;
+  const { type, subType, leagueId, seasonId, teamId } = metaData;
   const { width, title, Detail } = subType
     ? cardConfig[type][subType]
     : cardConfig[type];
   const key = generateKey(metaData);
-
   const checked = customData.has(key);
+
+  let renderHeader;
+
+  if (currentPage === "custom") {
+    if (headerData) {
+      const Detail = teamId ? TeamDetail : LeagueDetail;
+      const onClick = teamId ? onTeamClick : onLeagueClick;
+      renderHeader = (
+        <div
+          className="detail"
+          style={{
+            marginLeft: "auto",
+            marginRight: "1rem",
+            color: "#666",
+            cursor: "pointer",
+          }}
+          onClick={(e) => {
+            const metaData = e.target.closest(".detail").firstChild.dataset;
+            onClick(metaData);
+          }}
+        >
+          <Detail
+            {...headerData}
+            size="small"
+            seasonId={seasonId}
+            displayCode={true}
+          />
+        </div>
+      );
+    }
+    // headerData not loaded
+    else renderHeader = <div />;
+  }
+  // other page
+  else {
+    renderHeader = (
+      <Popup
+        content={checked ? "Remove from custom page" : "Add to custom page"}
+        size="small"
+        trigger={
+          <Checkbox
+            checked={checked}
+            style={{ marginLeft: "auto" }}
+            toggle={true}
+            onChange={(e) => {
+              e.preventDefault();
+              onCardToggleChange(metaData);
+            }}
+          />
+        }
+      />
+    );
+  }
 
   return (
     <Grid.Column width={width}>
@@ -78,15 +138,7 @@ function ContentCard({
         <Card.Content>
           <Card.Header style={{ display: "flex" }}>
             <h3 style={{ display: "inline-block" }}>{title}</h3>
-            <Checkbox
-              checked={checked}
-              style={{ marginLeft: "auto" }}
-              toggle={true}
-              onChange={(e) => {
-                e.preventDefault();
-                onCardToggleChange(metaData);
-              }}
-            />
+            {renderHeader}
           </Card.Header>
           {data ? (
             <Card.Description
@@ -103,7 +155,7 @@ function ContentCard({
                 overflowY: "auto",
               }}
             >
-              <Detail subType={subType} data={data} />
+              <Detail subType={subType} data={data} metaData={metaData} />
             </Card.Description>
           ) : (
             <Placeholder fluid={true}>

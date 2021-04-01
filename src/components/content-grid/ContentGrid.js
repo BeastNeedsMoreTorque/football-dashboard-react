@@ -6,6 +6,8 @@ import ContentCard from "./content-card/ContentCard";
 const propTypes = {
   contentData: PropTypes.arrayOf(PropTypes.object).isRequired,
   customData: PropTypes.object.isRequired,
+  currentPage: PropTypes.string.isRequired,
+  onLeagueClick: PropTypes.func.isRequired,
   onTeamClick: PropTypes.func.isRequired,
   onCardToggleChange: PropTypes.func.isRequired,
 };
@@ -13,17 +15,22 @@ const propTypes = {
 function ContentGrid({
   contentData,
   customData,
+  currentPage,
+  onLeagueClick,
   onTeamClick,
   onCardToggleChange,
 }) {
   return (
     <Grid>
-      {contentData.map(({ data, ...metaData }, i) => (
+      {contentData.map(({ data, headerData, ...metaData }, i) => (
         <ContentCard
           key={i}
-          customData={customData}
           metaData={metaData}
+          customData={customData}
+          currentPage={currentPage}
           data={data}
+          headerData={headerData}
+          onLeagueClick={onLeagueClick}
           onTeamClick={onTeamClick}
           onCardToggleChange={onCardToggleChange}
         />

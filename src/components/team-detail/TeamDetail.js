@@ -9,6 +9,7 @@ const propTypes = {
   name: PropTypes.string.isRequired,
   short_code: PropTypes.string.isRequired,
   logo: PropTypes.string.isRequired,
+  size: PropTypes.string,
   displayCode: PropTypes.bool,
 };
 const defaultProps = {
@@ -22,6 +23,7 @@ function TeamDetail({
   name,
   short_code,
   logo,
+  size,
   displayCode,
 }) {
   return (
@@ -37,8 +39,22 @@ function TeamDetail({
         src={logo}
         alt={`Logo of ${name}`}
         title={name}
+        style={
+          size === "small"
+            ? { width: "1.3rem", marginRight: "0.5rem" }
+            : { width: "1.3rem", marginRight: "1rem" }
+        }
       />
-      <div className="team-name">{displayCode ? short_code : name}</div>
+      <div
+        className="team-name"
+        style={
+          size === "small"
+            ? { fontWeight: "normal", fontSize: "1rem", marginTop: "0" }
+            : { marginTop: "0" }
+        }
+      >
+        {displayCode ? short_code : name}
+      </div>
     </div>
   );
 }

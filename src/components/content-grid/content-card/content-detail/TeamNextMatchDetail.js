@@ -7,14 +7,16 @@ import { formatDate } from "../../../../others/helper";
 
 const propTypes = {
   data: PropTypes.object.isRequired,
+  metaData: PropTypes.object.isRequired,
 };
 
 const config = {
   tableHeader: ["Schedule", "Opponent"],
 };
 
-function TeamNextMatchDetail({ data }) {
-  const { matchesData, teamsDataByName, teamCode } = data;
+function TeamNextMatchDetail({ data, metaData }) {
+  const { matchesData, teamsDataByName } = data;
+  const { seasonId, teamCode } = metaData;
 
   return (
     <Table
@@ -55,6 +57,7 @@ function TeamNextMatchDetail({ data }) {
                 children={
                   <TeamDetail
                     {...teamsDataByName[opponentName]}
+                    seasonId={seasonId}
                     displayCode={true}
                   />
                 }

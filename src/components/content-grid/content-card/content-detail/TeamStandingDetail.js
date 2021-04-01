@@ -4,13 +4,17 @@ import PropTypes from "prop-types";
 import { Table } from "semantic-ui-react";
 import TeamDetail from "../../../team-detail/TeamDetail";
 
-const propTypes = { data: PropTypes.object.isRequired };
+const propTypes = {
+  data: PropTypes.object.isRequired,
+  metaData: PropTypes.object.isRequired,
+};
 
 // prettier-ignore
 const config = { tableHeader: ["#", "Team", "Points", "Diff", "Played", "W", "D", "L"] };
 
-function TeamStandingDetail({ data }) {
-  const { standingsData, teamsData, teamId } = data;
+function TeamStandingDetail({ data, metaData }) {
+  const { standingsData, teamsData } = data;
+  const { seasonId, teamId } = metaData;
   const [currentTeam] = standingsData.filter(
     (team) => team.team_id === +teamId
   );
@@ -41,7 +45,7 @@ function TeamStandingDetail({ data }) {
             <Table.Cell
               className="team-cell"
               children={
-                <TeamDetail {...teamsData[team.team_id]} displayCode={true} />
+                <TeamDetail {...teamsData[team.team_id]} seasonId={seasonId} displayCode={true} />
               }
             />
             <Table.Cell width={2}>{team.points}</Table.Cell>
