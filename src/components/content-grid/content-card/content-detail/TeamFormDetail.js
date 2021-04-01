@@ -24,7 +24,7 @@ function TeamFormDetail({ data }) {
   let draws = 0;
   let losts = 0;
 
-  matchesData.forEach((match) => {
+  matchesData.forEach((match, index) => {
     const isHome = match.home_team.short_code === teamCode;
     const opponentName = isHome ? match.away_team.name : match.home_team.name;
 
@@ -53,13 +53,13 @@ function TeamFormDetail({ data }) {
     }
 
     OpponentRow.push(
-      <Table.Cell key={match.match_id} className="team-cell">
+      <Table.Cell key={index} className="team-cell">
         <TeamDetail {...teamsDataByName[opponentName]} displayCode={true} />
       </Table.Cell>
     );
 
     ScoreRow.push(
-      <Table.Cell key={match.match_id} className={result}>
+      <Table.Cell key={index} className={result}>
         {isHome
           ? `${match.stats.home_score} - ${match.stats.away_score}`
           : `${match.stats.away_score} - ${match.stats.home_score}`}
@@ -67,7 +67,7 @@ function TeamFormDetail({ data }) {
     );
 
     DateRow.push(
-      <Table.Cell key={match.match_id}>
+      <Table.Cell key={index}>
         {match.match_start.split(" ")[0].slice(5)}
       </Table.Cell>
     );

@@ -39,20 +39,25 @@ class App extends React.Component {
   }
 
   onClickLeague = async ({ leagueId, seasonId }) => {
+    window.scroll(0, 0);
+    // set content
     this.setState({
       navLoading: true,
+      // prettier-ignore
       contentData: [
-        { type: "standings", data: null },
-        { type: "matches", subType: "Result", data: null },
-        { type: "matches", subType: "Upcoming", data: null },
-        { type: "topScorers", data: null },
+        { type: "standings", data: null, leagueId, seasonId },
+        { type: "matches", subType: "Result", data: null, leagueId, seasonId },
+        { type: "matches", subType: "Upcoming", data: null, leagueId, seasonId },
+        { type: "topScorers", data: null, leagueId, seasonId },
       ],
     });
 
+    // set header
     model
       .getLeagueName(leagueId)
       .then((leagueName) => this.setState({ headerTitle: leagueName }));
 
+    // get data
     const standingsData = await model.getStandingsData(leagueId, seasonId);
     const {
       teamsData,
@@ -60,76 +65,84 @@ class App extends React.Component {
       teamsDataByName,
     } = await model.getTeamsData(leagueId, standingsData);
 
-    const currentData = this.state.contentData.map((v) => {
-      return { ...v };
-    });
-    currentData[0].data = { standingsData, teamsData };
-
+    // render nav
     this.setState({
       navLoading: false,
       navTeams: teamsDataArr,
-      contentData: currentData,
     });
 
-    model.getMatchResultsData(leagueId, seasonId).then((matchesData) => {
-      currentData[1].data = { matchesData, teamsDataByName };
-      this.setState({ contentData: currentData });
-    });
-
-    model.getMatchUpcomingData(leagueId, seasonId).then((matchesData) => {
-      currentData[2].data = { matchesData, teamsDataByName };
-      this.setState({ contentData: currentData });
-    });
-
-    model.getTopScorersData(leagueId, seasonId).then((topScorersData) => {
-      currentData[3].data = { topScorersData, teamsDataByName };
-      this.setState({ contentData: currentData });
-    });
+    // render content (feed data)
+    this.renderContent({ standingsData, teamsData, teamsDataByName });
   };
 
   onClickTeam = async ({ leagueId, teamId, teamCode }) => {
+    window.scroll(0, 0);
+    // set content
     const seasonId = this.state.currentSeason[leagueId];
-
+    // prettier-ignore
     this.setState({
       contentData: [
-        { type: "teamStanding", data: null },
-        { type: "teamNextMatch", data: null },
-        { type: "teamForm", data: null },
+        { type: "teamStanding", data: null, leagueId, seasonId, teamId, teamCode },
+        { type: "teamNextMatch", data: null, leagueId, seasonId, teamId, teamCode },
+        { type: "teamForm", data: null, leagueId, seasonId, teamId, teamCode },
       ],
     });
 
+    // set header
     model
       .getTeamName(leagueId, teamId)
       .then((teamName) => this.setState({ headerTitle: teamName }));
 
+    // get data
     const standingsData = await model.getStandingsData(leagueId, seasonId);
     const { teamsData, teamsDataByName } = await model.getTeamsData(
       leagueId,
       standingsData
     );
 
+    // render content (feed data)
+    this.renderContent({ standingsData, teamsData, teamsDataByName });
+  };
+
+  renderContent = ({ standingsData, teamsData, teamsDataByName }) => {
+    // copy current state
     const currentData = this.state.contentData.map((v) => {
       return { ...v };
     });
 
-    currentData[0].data = { standingsData, teamsData, teamId };
-    this.setState({
-      contentData: currentData,
+    // get data, update current data (copy)
+    // prettier-ignore
+    currentData.forEach(async (card, i) => {
+      const setDataProm = (() => {
+        const { leagueId, seasonId, teamId, teamCode } = card;
+        switch (card.type) {
+          case "standings":
+          case "teamStanding":
+            currentData[i].data = { standingsData, teamsData, teamId };
+            return Promise.resolve();
+          case "matches":
+          case "teamNextMatch":
+          case "teamForm":
+            // league match results, team form
+            if ((card.subType && card.subType === "Result") || card.type === "teamForm")
+              return model.getMatchResultsData({ leagueId, seasonId, teamCode })
+                    .then(matchesData => currentData[i].data = { matchesData, teamsDataByName, teamCode });
+            // league match upcoming, team match upcoming
+            else
+              return model.getMatchUpcomingData({ leagueId, seasonId, teamCode })
+                    .then(matchesData => currentData[i].data = { matchesData, teamsDataByName, teamCode });
+          case "topScorers":
+            return model.getTopScorersData(leagueId, seasonId)
+                  .then(topScorersData => currentData[i].data = { topScorersData, teamsDataByName });
+          default:
+            console.log("no match");
+            return Promise.resolve();
+        }
+      })();
+
+      // set state with current data (copy)
+      setDataProm.then(() => this.setState({ contentData: currentData }));
     });
-
-    model
-      .getMatchUpcomingData(leagueId, seasonId, true, teamCode)
-      .then((matchesData) => {
-        currentData[1].data = { matchesData, teamsDataByName, teamCode };
-        this.setState({ contentData: currentData });
-      });
-
-    model
-      .getMatchResultsData(leagueId, seasonId, true, teamCode)
-      .then((matchesData) => {
-        currentData[2].data = { matchesData, teamsDataByName, teamCode };
-        this.setState({ contentData: currentData });
-      });
   };
 
   render() {

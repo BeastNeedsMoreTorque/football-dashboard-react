@@ -20,43 +20,37 @@ const cardConfig = {
   standings: {
     width: 16,
     title: "Standings",
-    dummyLength: 15,
     Detail: StandingsDetail,
   },
   matches: {
     width: 8,
     title: "Match",
-    dummyLength: 10,
     Detail: MatchesDetail,
   },
   topScorers: {
     width: 16,
     title: "Top Scorers",
-    dummyLength: 10,
     Detail: TopScorersDetail,
   },
   teamStanding: {
     width: 8,
     title: "Standings",
-    dummyLength: 10,
     Detail: TeamStandingDetail,
   },
   teamNextMatch: {
     width: 8,
     title: "Upcoming",
-    dummyLength: 10,
     Detail: TeamNextMatchDetail,
   },
   teamForm: {
     width: 16,
     title: "Form",
-    dummyLength: 15,
     Detail: TeamFormDetail,
   },
 };
 
 function ContentCard({ type, subType, data, onClickTeam }) {
-  const { width, title, dummyLength, Detail } = cardConfig[type];
+  const { width, title, Detail } = cardConfig[type];
 
   return (
     <Grid.Column width={width}>
@@ -83,7 +77,7 @@ function ContentCard({ type, subType, data, onClickTeam }) {
             </Card.Description>
           ) : (
             <Placeholder fluid={true}>
-              {Array.from({ length: dummyLength }, (_, i) => (
+              {Array.from({ length: 15 }, (_, i) => (
                 <Placeholder.Line key={i} />
               ))}
             </Placeholder>

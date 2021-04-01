@@ -90,12 +90,8 @@ export const model = {
     return { teamsDataArr, teamsData, teamsDataByName };
   },
 
-  async getMatchResultsData(
-    leagueId,
-    seasonId,
-    isMonth = false,
-    teamCode = null
-  ) {
+  async getMatchResultsData({ leagueId, seasonId, teamCode }) {
+    const isMonth = teamCode ? true : false;
     const matchesData = await api.getMatchResults(leagueId, seasonId, isMonth);
 
     // filter status
@@ -127,12 +123,8 @@ export const model = {
     return matchesSorted;
   },
 
-  async getMatchUpcomingData(
-    leagueId,
-    seasonId,
-    isMonth = false,
-    teamCode = null
-  ) {
+  async getMatchUpcomingData({ leagueId, seasonId, teamCode }) {
+    const isMonth = teamCode ? true : false;
     const matchesData = await api.getMatchUpcoming(leagueId, seasonId, isMonth);
 
     // filter status
