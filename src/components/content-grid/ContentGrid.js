@@ -5,19 +5,27 @@ import ContentCard from "./content-card/ContentCard";
 
 const propTypes = {
   contentData: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onClickTeam: PropTypes.func.isRequired,
+  customData: PropTypes.object.isRequired,
+  onTeamClick: PropTypes.func.isRequired,
+  onCardToggleChange: PropTypes.func.isRequired,
 };
 
-function ContentGrid({ contentData, onClickTeam }) {
+function ContentGrid({
+  contentData,
+  customData,
+  onTeamClick,
+  onCardToggleChange,
+}) {
   return (
     <Grid>
-      {contentData.map(({ type, subType, data }, i) => (
+      {contentData.map(({ data, ...metaData }, i) => (
         <ContentCard
           key={i}
-          type={type}
-          subType={subType}
+          customData={customData}
+          metaData={metaData}
           data={data}
-          onClickTeam={onClickTeam}
+          onTeamClick={onTeamClick}
+          onCardToggleChange={onCardToggleChange}
         />
       ))}
     </Grid>

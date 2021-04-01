@@ -37,3 +37,21 @@ export const formatDate = function (dateStr) {
     minute: "2-digit",
   }).format(date);
 };
+
+export const generateKey = function ({
+  type,
+  subType,
+  leagueId,
+  seasonId,
+  teamId,
+  teamCode,
+}) {
+  let key = `${type} ${leagueId} ${seasonId}`;
+  if (subType) key += " " + subType;
+  if (teamId) {
+    key += " " + teamId;
+    key += " " + teamCode;
+  }
+
+  return key;
+};

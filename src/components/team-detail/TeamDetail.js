@@ -3,8 +3,9 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const propTypes = {
+  leagueId: PropTypes.string,
+  seasonId: PropTypes.string,
   team_id: PropTypes.number.isRequired,
-  leagueId: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   short_code: PropTypes.string.isRequired,
   logo: PropTypes.string.isRequired,
@@ -15,8 +16,9 @@ const defaultProps = {
 };
 
 function TeamDetail({
-  team_id,
   leagueId,
+  seasonId,
+  team_id,
   name,
   short_code,
   logo,
@@ -28,6 +30,7 @@ function TeamDetail({
       data-team-id={team_id}
       data-team-code={short_code}
       data-league-id={leagueId}
+      data-season-id={seasonId}
     >
       <img
         className="team-logo"

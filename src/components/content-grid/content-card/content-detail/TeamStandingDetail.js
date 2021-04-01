@@ -20,7 +20,7 @@ function TeamStandingDetail({ data }) {
       .querySelector(".team-standing-detail .current")
       .scrollIntoView({ block: "center" });
     window.scroll(0, 0);
-  });
+  }, [data]);
 
   return (
     <Table className="team-standing-detail" celled={true} size="small">

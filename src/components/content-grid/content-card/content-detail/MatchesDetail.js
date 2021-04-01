@@ -11,8 +11,8 @@ const propTypes = {
 };
 
 const config = {
-  Result: { tableHeader: ["Home", "Result", "Away"] },
-  Upcoming: { tableHeader: ["Home", "Schedule", "Away"] },
+  result: { tableHeader: ["Home", "Result", "Away"] },
+  upcoming: { tableHeader: ["Home", "Schedule", "Away"] },
 };
 
 const getUniqueDates = function (dateArr) {
@@ -24,7 +24,7 @@ function MatchesDetail({ data, subType }) {
   const uniqueDates = getUniqueDates(
     matchesData.map((match) => match.match_start)
   );
-  if (subType === "Result") uniqueDates.reverse();
+  if (subType === "result") uniqueDates.reverse();
   const [date, setDate] = useState(uniqueDates[0]);
 
   return (
@@ -62,7 +62,7 @@ function MatchesDetail({ data, subType }) {
                     }`}
                     children={<TeamDetail {...homeTeam} displayCode={true} />}
                   />
-                  {subType === "Result" ? (
+                  {subType === "result" ? (
                     <Table.Cell
                       className={`score ${
                         homeScore === awayScore ? "winner" : ""

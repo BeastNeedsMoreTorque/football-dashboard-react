@@ -13,12 +13,14 @@ function TeamFormDetail({ data }) {
   const { matchesData, teamsDataByName, teamCode } = data;
 
   const OpponentRow = [
-    <Table.Cell className="header" width={2} children="Opponent" />,
+    <Table.Cell key={0} className="header" width={2} children="Opponent" />,
   ];
   const ScoreRow = [
-    <Table.Cell className="header" width={2} children="Result" />,
+    <Table.Cell key={0} className="header" width={2} children="Result" />,
   ];
-  const DateRow = [<Table.Cell className="header" width={2} children="Date" />];
+  const DateRow = [
+    <Table.Cell key={0} className="header" width={2} children="Date" />,
+  ];
 
   let wins = 0;
   let draws = 0;
@@ -53,13 +55,13 @@ function TeamFormDetail({ data }) {
     }
 
     OpponentRow.push(
-      <Table.Cell key={index} className="team-cell">
+      <Table.Cell key={index + 1} className="team-cell">
         <TeamDetail {...teamsDataByName[opponentName]} displayCode={true} />
       </Table.Cell>
     );
 
     ScoreRow.push(
-      <Table.Cell key={index} className={result}>
+      <Table.Cell key={index + 1} className={result}>
         {isHome
           ? `${match.stats.home_score} - ${match.stats.away_score}`
           : `${match.stats.away_score} - ${match.stats.home_score}`}
@@ -67,7 +69,7 @@ function TeamFormDetail({ data }) {
     );
 
     DateRow.push(
-      <Table.Cell key={index}>
+      <Table.Cell key={index + 1}>
         {match.match_start.split(" ")[0].slice(5)}
       </Table.Cell>
     );
