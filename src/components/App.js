@@ -20,13 +20,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    window.addEventListener("beforeunload", () => {
-      localStorage.setItem(
-        "customData",
-        JSON.stringify(Array.from(this.state.customData.values()))
-      );
-    });
-
     const customData = new Map();
     const localCustom = JSON.parse(localStorage.getItem("customData"));
     if (localCustom.length) {
@@ -54,6 +47,15 @@ class App extends React.Component {
     const leagues = await model.getLeagueData();
 
     this.setState({ navLeagues: leagues, navLoading: false });
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.customData !== this.state.customData) {
+      localStorage.setItem(
+        "customData",
+        JSON.stringify(Array.from(this.state.customData.values()))
+      );
+    }
   }
 
   onCustomClick = async () => {
