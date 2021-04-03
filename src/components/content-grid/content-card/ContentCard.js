@@ -153,51 +153,39 @@ function ContentCard({
               }}
             />
           ) : null}
-          <Card.Header
-            style={
-              editMode
-                ? { display: "flex", opacity: "0.7", pointerEvents: "none" }
-                : { display: "flex" }
-            }
+          <div
+            style={editMode ? { opacity: "0.7", pointerEvents: "none" } : {}}
           >
-            <h3 style={{ display: "inline-block", margin: "0" }}>{title}</h3>
-            {renderHeader}
-          </Card.Header>
-          {data ? (
-            <Card.Description
-              onClick={(e) => {
-                if (!e.target.closest(".team-cell")) return;
-                const { teamId, teamCode } = e.target
-                  .closest(".team-cell")
-                  .querySelector(".team-detail").dataset;
+            <Card.Header style={{ display: "flex" }}>
+              <h3 style={{ display: "inline-block", margin: "0" }}>{title}</h3>
+              {renderHeader}
+            </Card.Header>
+            {data ? (
+              <Card.Description
+                onClick={(e) => {
+                  if (!e.target.closest(".team-cell")) return;
+                  const { teamId, teamCode } = e.target
+                    .closest(".team-cell")
+                    .querySelector(".team-detail").dataset;
 
-                onTeamClick({ leagueId, seasonId, teamId, teamCode });
-              }}
-              style={
-                editMode
-                  ? {
-                      marginTop: "1rem",
-                      height: `${width === 16 ? "350px" : "280px"}`,
-                      overflowY: "auto",
-                      opacity: "0.7",
-                      pointerEvents: "none",
-                    }
-                  : {
-                      marginTop: "1rem",
-                      height: `${width === 16 ? "350px" : "280px"}`,
-                      overflowY: "auto",
-                    }
-              }
-            >
-              <Detail subType={subType} data={data} metaData={metaData} />
-            </Card.Description>
-          ) : (
-            <Placeholder fluid={true}>
-              {Array.from({ length: 15 }, (_, i) => (
-                <Placeholder.Line key={i} />
-              ))}
-            </Placeholder>
-          )}
+                  onTeamClick({ leagueId, seasonId, teamId, teamCode });
+                }}
+                style={{
+                  marginTop: "1rem",
+                  height: "300px",
+                  overflowY: "auto",
+                }}
+              >
+                <Detail subType={subType} data={data} metaData={metaData} />
+              </Card.Description>
+            ) : (
+              <Placeholder fluid={true}>
+                {Array.from({ length: 15 }, (_, i) => (
+                  <Placeholder.Line key={i} />
+                ))}
+              </Placeholder>
+            )}
+          </div>
         </Card.Content>
       </Card>
     </Grid.Column>

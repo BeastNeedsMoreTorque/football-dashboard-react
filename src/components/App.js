@@ -38,6 +38,7 @@ class App extends React.Component {
       customData,
       currentPage: "home",
       editMode: false,
+      editHistory: [],
       selected: new Map(),
     };
   }
@@ -291,9 +292,15 @@ class App extends React.Component {
       nextCustom.set(key, { ...metaData });
     });
 
+    const history = {
+      customData: this.state.customData,
+      contentData: this.state.contentData,
+    };
+
     this.setState({
       contentData: currentContent,
       customData: nextCustom,
+      editHistory: this.state.editHistory.concat([history]),
     });
   };
 
@@ -314,10 +321,29 @@ class App extends React.Component {
     const currentContent = this.state.contentData.slice();
     deleteIndices.forEach((i) => (currentContent[i] = null));
 
+    const history = {
+      customData: this.state.customData,
+      contentData: this.state.contentData,
+    };
+
     this.setState({
       contentData: currentContent.filter((v) => v),
       customData: currentCustom,
+      editHistory: this.state.editHistory.concat([history]),
       selected: new Map(),
+    });
+  };
+
+  onUndoClick = () => {
+    this.setState({
+      customData: this.state.editHistory[this.state.editHistory.length - 1]
+        .customData,
+      contentData: this.state.editHistory[this.state.editHistory.length - 1]
+        .contentData,
+      editHistory: this.state.editHistory.slice(
+        0,
+        this.state.editHistory.length - 1
+      ),
     });
   };
 
@@ -392,29 +418,28 @@ class App extends React.Component {
           <MainHeader title={this.state.headerTitle} />
           {this.state.currentPage === "custom" ? (
             <Segment
-              style={
+              style={Object.assign(
+                {
+                  display: "flex",
+                  alignItems: "center",
+                  transition: "all 0.2s ease-in-out",
+                },
                 this.state.editMode
                   ? {
-                      display: "flex",
-                      alignItems: "center",
                       position: "sticky",
                       top: "0",
                       zIndex: "99",
                       margin: "1rem -2rem",
-                      transition: "all 0.2s linear",
                     }
-                  : {
-                      display: "flex",
-                      alignItems: "center",
-                      transition: "all 0.2s linear",
-                    }
-              }
+                  : {}
+              )}
             >
               <Button
                 size="small"
                 onClick={() =>
                   this.setState({
                     editMode: !this.state.editMode,
+                    editHistory: [],
                     selected: new Map(),
                   })
                 }
@@ -429,9 +454,11 @@ class App extends React.Component {
                 <EditController
                   customData={this.state.customData}
                   selected={this.state.selected}
+                  editHistory={this.state.editHistory}
                   onSelectAllClick={this.onSelectAllClick}
                   onMoveClick={this.onMoveClick}
                   onDeleteClick={this.onDeleteClick}
+                  onUndoClick={this.onUndoClick}
                 />
               ) : (
                 <div>

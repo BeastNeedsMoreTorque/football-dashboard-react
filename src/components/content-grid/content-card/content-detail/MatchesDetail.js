@@ -1,5 +1,5 @@
 import "./MatchesDetail.css";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Table } from "semantic-ui-react";
 import TeamDetail from "../../../team-detail/TeamDetail";
@@ -15,22 +15,21 @@ const config = {
   upcoming: { tableHeader: ["Home", "Schedule", "Away"] },
 };
 
-const getUniqueDates = function (dateArr) {
-  return Array.from(new Set(dateArr.map((date) => date.slice(0, 10))));
+const getUniqueDates = function (dateArr, subType) {
+  const unique = Array.from(new Set(dateArr.map((date) => date.slice(0, 10))));
+  if (subType === "result") unique.reverse();
+
+  return unique;
 };
 
 function MatchesDetail({ data, subType }) {
   const { matchesData, teamsDataByName } = data;
   const uniqueDates = getUniqueDates(
-    matchesData.map((match) => match.match_start)
+    matchesData.map((match) => match.match_start),
+    subType
   );
-  if (subType === "result") uniqueDates.reverse();
-
   const [date, setDate] = useState(uniqueDates[0]);
-
-  useEffect(() => {
-    setDate(uniqueDates[0]);
-  }, [uniqueDates]);
+  if (!uniqueDates.includes(date)) setDate(uniqueDates[0]);
 
   return (
     <>

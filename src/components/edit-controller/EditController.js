@@ -5,17 +5,21 @@ import { Button, Icon, Popup } from "semantic-ui-react";
 const propTypes = {
   customData: PropTypes.object.isRequired,
   selected: PropTypes.object.isRequired,
+  editHistory: PropTypes.arrayOf(PropTypes.object).isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   onMoveClick: PropTypes.func.isRequired,
   onDeleteClick: PropTypes.func.isRequired,
+  onUndoClick: PropTypes.func.isRequired,
 };
 
 function EditController({
   customData,
   selected,
+  editHistory,
   onSelectAllClick,
   onMoveClick,
   onDeleteClick,
+  onUndoClick,
 }) {
   const selectedAll = selected.size && customData.size === selected.size;
   const keys = Array.from(customData.keys());
@@ -63,11 +67,18 @@ function EditController({
           onClick={() => {
             if (
               window.confirm(
-                `Remove ${selected.size} item${selected.size > 1 ? "s" : ""}?`
+                `Remove ${selected.size} content${
+                  selected.size > 1 ? "s" : ""
+                }?`
               )
             )
               onDeleteClick();
           }}
+        />
+        <Button
+          icon="undo"
+          disabled={!editHistory.length}
+          onClick={onUndoClick}
         />
       </Button.Group>
       <div style={{ marginLeft: "1rem" }}>
