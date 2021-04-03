@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import api from "../api/sportDataApi";
 import { model } from "../model/model.js";
-import { Loader, Menu, Dropdown } from "semantic-ui-react";
+import { Loader, Menu, Dropdown, Segment, Button } from "semantic-ui-react";
 
 import Sidebar from "./sidebar/Sidebar";
 import MainLogo from "./main-logo/MainLogo";
@@ -14,21 +14,43 @@ import MainHeader from "./main-header/MainHeader";
 import MainContent from "./main-content/MainContent";
 import ContentGrid from "./content-grid/ContentGrid";
 import { generateKey } from "../others/helper";
+import EditController from "./edit-controller/EditController";
 
 class App extends React.Component {
-  state = {
-    headerTitle: "Welcome To Football Dashboard",
-    navLoading: true,
-    navLeagues: [],
-    navTeams: [],
-    contentData: [],
-    customData: new Map(),
-    currentPage: "home",
-  };
+  constructor(props) {
+    super(props);
+
+    window.addEventListener("beforeunload", () => {
+      localStorage.setItem(
+        "customData",
+        JSON.stringify(Array.from(this.state.customData.values()))
+      );
+    });
+
+    const customData = new Map();
+    const localCustom = JSON.parse(localStorage.getItem("customData"));
+    if (localCustom.length) {
+      localCustom.forEach((metaData) => {
+        const key = generateKey(metaData);
+        customData.set(key, metaData);
+      });
+    }
+
+    this.state = {
+      headerTitle: "Welcome To Football Dashboard",
+      navLoading: true,
+      navLeagues: [],
+      navTeams: [],
+      contentData: [],
+      customData,
+      currentPage: "home",
+      editMode: false,
+      selected: new Map(),
+    };
+  }
 
   async componentDidMount() {
     await api.initCache("sportDataApi");
-
     const leagues = await model.getLeagueData();
 
     this.setState({ navLeagues: leagues, navLoading: false });
@@ -222,20 +244,85 @@ class App extends React.Component {
     }
   };
 
-  onCardToggleChange = (metaData) => {
+  onSelectCard = (metaData) => {
     const key = generateKey(metaData);
-    const currentMap = new Map(this.state.customData);
+    const update = this.state.editMode ? "selected" : "customData";
+    const current = new Map(this.state[update]);
 
-    currentMap.has(key)
-      ? currentMap.delete(key)
-      : currentMap.set(key, { ...metaData });
-    this.setState({ customData: currentMap });
+    current.has(key) ? current.delete(key) : current.set(key, { ...metaData });
+    this.setState({ [update]: current });
+  };
+
+  /* Edit Mode */
+  onSelectAllClick = (selectedAll) => {
+    const nextSelected = selectedAll
+      ? new Map()
+      : new Map(this.state.customData);
+    this.setState({ selected: nextSelected });
+  };
+
+  onMoveClick = (direction) => {
+    // get items indices to move
+    const moveIndices = [];
+    Array.from(this.state.customData.keys()).forEach((key, index) => {
+      if (this.state.selected.has(key)) moveIndices.push(index);
+    });
+
+    // get copy of current content data
+    const currentContent = this.state.contentData.slice();
+    if (direction === "right") moveIndices.reverse();
+
+    // make swap
+    moveIndices.forEach((i) => {
+      const swapIndex = direction === "left" ? i - 1 : i + 1;
+      // swap
+      [currentContent[swapIndex], currentContent[i]] = [
+        currentContent[i],
+        currentContent[swapIndex],
+      ];
+    });
+
+    // reset custom
+    const nextCustom = new Map();
+    currentContent.forEach((metaData) => {
+      const key = generateKey(metaData);
+      nextCustom.set(key, { ...metaData });
+    });
+
+    this.setState({
+      contentData: currentContent,
+      customData: nextCustom,
+    });
+  };
+
+  onDeleteClick = () => {
+    // get copy of current custom
+    const currentCustom = new Map(this.state.customData);
+
+    // get delete indices, delete from custom
+    const deleteIndices = [];
+    Array.from(currentCustom.keys()).forEach((key, index) => {
+      if (this.state.selected.has(key)) {
+        currentCustom.delete(key);
+        deleteIndices.push(index);
+      }
+    });
+
+    // set current content to null for each index
+    const currentContent = this.state.contentData.slice();
+    deleteIndices.forEach((i) => (currentContent[i] = null));
+
+    this.setState({
+      contentData: currentContent.filter((v) => v),
+      customData: currentCustom,
+      selected: new Map(),
+    });
   };
 
   render() {
     return (
       <div className="app">
-        <Sidebar>
+        <Sidebar editMode={this.state.editMode}>
           <MainLogo />
           <MainNav>
             <Menu vertical={true} style={{ position: "relative" }} size="large">
@@ -301,14 +388,68 @@ class App extends React.Component {
         </Sidebar>
         <MainDisplay>
           <MainHeader title={this.state.headerTitle} />
+          {this.state.currentPage === "custom" ? (
+            <Segment
+              style={
+                this.state.editMode
+                  ? {
+                      display: "flex",
+                      alignItems: "center",
+                      position: "sticky",
+                      top: "0",
+                      zIndex: "99",
+                      margin: "1rem -2rem",
+                      transition: "all 0.2s linear",
+                    }
+                  : {
+                      display: "flex",
+                      alignItems: "center",
+                      transition: "all 0.2s linear",
+                    }
+              }
+            >
+              <Button
+                size="small"
+                onClick={() =>
+                  this.setState({
+                    editMode: !this.state.editMode,
+                    selected: new Map(),
+                  })
+                }
+                basic={!this.state.editMode}
+                color="blue"
+                disabled={!this.state.editMode && !this.state.customData.size}
+                style={{ marginRight: "2rem" }}
+              >
+                {this.state.editMode ? "Done" : "Edit"}
+              </Button>
+              {this.state.editMode ? (
+                <EditController
+                  customData={this.state.customData}
+                  selected={this.state.selected}
+                  onSelectAllClick={this.onSelectAllClick}
+                  onMoveClick={this.onMoveClick}
+                  onDeleteClick={this.onDeleteClick}
+                />
+              ) : (
+                <div>
+                  {this.state.customData.size
+                    ? "You can remove or change order of contents"
+                    : "No contents added yet"}
+                </div>
+              )}
+            </Segment>
+          ) : null}
           <MainContent>
             <ContentGrid
+              editMode={this.state.editMode}
+              selected={this.state.selected}
               contentData={this.state.contentData}
               customData={this.state.customData}
               currentPage={this.state.currentPage}
               onLeagueClick={this.onLeagueClick}
               onTeamClick={this.onTeamClick}
-              onCardToggleChange={this.onCardToggleChange}
+              onSelectCard={this.onSelectCard}
             />
           </MainContent>
         </MainDisplay>

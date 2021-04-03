@@ -1,5 +1,5 @@
 import "./MatchesDetail.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Table } from "semantic-ui-react";
 import TeamDetail from "../../../team-detail/TeamDetail";
@@ -25,7 +25,12 @@ function MatchesDetail({ data, subType }) {
     matchesData.map((match) => match.match_start)
   );
   if (subType === "result") uniqueDates.reverse();
+
   const [date, setDate] = useState(uniqueDates[0]);
+
+  useEffect(() => {
+    setDate(uniqueDates[0]);
+  }, [uniqueDates]);
 
   return (
     <>

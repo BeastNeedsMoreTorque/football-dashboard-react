@@ -12,6 +12,8 @@ import TeamFormDetail from "./content-detail/TeamFormDetail";
 import { generateKey } from "../../../others/helper";
 
 const propTypes = {
+  editMode: PropTypes.bool.isRequired,
+  selected: PropTypes.object.isRequired,
   metaData: PropTypes.object.isRequired,
   customData: PropTypes.object.isRequired,
   currentPage: PropTypes.string.isRequired,
@@ -19,7 +21,7 @@ const propTypes = {
   data: PropTypes.object,
   onLeagueClick: PropTypes.func.isRequired,
   onTeamClick: PropTypes.func.isRequired,
-  onCardToggleChange: PropTypes.func.isRequired,
+  onSelectCard: PropTypes.func.isRequired,
 };
 
 const cardConfig = {
@@ -63,6 +65,8 @@ const cardConfig = {
 };
 
 function ContentCard({
+  editMode,
+  selected,
   metaData,
   customData,
   currentPage,
@@ -70,17 +74,14 @@ function ContentCard({
   headerData,
   onLeagueClick,
   onTeamClick,
-  onCardToggleChange,
+  onSelectCard,
 }) {
   const { type, subType, leagueId, seasonId, teamId } = metaData;
   const { width, title, Detail } = subType
     ? cardConfig[type][subType]
     : cardConfig[type];
-  const key = generateKey(metaData);
-  const checked = customData.has(key);
 
   let renderHeader;
-
   if (currentPage === "custom") {
     if (headerData) {
       const Detail = teamId ? TeamDetail : LeagueDetail;
@@ -113,6 +114,9 @@ function ContentCard({
   }
   // other page
   else {
+    const key = generateKey(metaData);
+    const checked = customData.has(key);
+
     renderHeader = (
       <Popup
         content={checked ? "Remove from custom page" : "Add to custom page"}
@@ -124,7 +128,7 @@ function ContentCard({
             toggle={true}
             onChange={(e) => {
               e.preventDefault();
-              onCardToggleChange(metaData);
+              onSelectCard(metaData);
             }}
           />
         }
@@ -136,8 +140,27 @@ function ContentCard({
     <Grid.Column width={width}>
       <Card fluid={true}>
         <Card.Content>
-          <Card.Header style={{ display: "flex" }}>
-            <h3 style={{ display: "inline-block" }}>{title}</h3>
+          {editMode ? (
+            <Checkbox
+              checked={selected.has(generateKey(metaData))}
+              style={{
+                marginBottom: "1rem",
+                float: "right",
+              }}
+              onChange={(e) => {
+                e.preventDefault();
+                onSelectCard(metaData);
+              }}
+            />
+          ) : null}
+          <Card.Header
+            style={
+              editMode
+                ? { display: "flex", opacity: "0.7", pointerEvents: "none" }
+                : { display: "flex" }
+            }
+          >
+            <h3 style={{ display: "inline-block", margin: "0" }}>{title}</h3>
             {renderHeader}
           </Card.Header>
           {data ? (
@@ -150,10 +173,21 @@ function ContentCard({
 
                 onTeamClick({ leagueId, seasonId, teamId, teamCode });
               }}
-              style={{
-                maxHeight: `${width === 16 ? "350px" : "300px"}`,
-                overflowY: "auto",
-              }}
+              style={
+                editMode
+                  ? {
+                      marginTop: "1rem",
+                      height: `${width === 16 ? "350px" : "280px"}`,
+                      overflowY: "auto",
+                      opacity: "0.7",
+                      pointerEvents: "none",
+                    }
+                  : {
+                      marginTop: "1rem",
+                      height: `${width === 16 ? "350px" : "280px"}`,
+                      overflowY: "auto",
+                    }
+              }
             >
               <Detail subType={subType} data={data} metaData={metaData} />
             </Card.Description>
