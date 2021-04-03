@@ -22,7 +22,7 @@ class App extends React.Component {
 
     const customData = new Map();
     const localCustom = JSON.parse(localStorage.getItem("customData"));
-    if (localCustom.length) {
+    if (localCustom?.length) {
       localCustom.forEach((metaData) => {
         const key = generateKey(metaData);
         customData.set(key, metaData);
