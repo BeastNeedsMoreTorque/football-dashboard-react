@@ -29,7 +29,7 @@
 
 - Making components reusable
   - [TeamDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/team-detail/TeamDetail.js)
-    ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
+  ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
   - [LeagueDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/league-detail/LeagueDetail.js)
   
 - Refactored placeholder & actual data rendering code
