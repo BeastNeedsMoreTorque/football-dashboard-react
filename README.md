@@ -2,13 +2,22 @@
 
 - Rebuilding [Football Dashboard](https://github.com/sanginchun/football-dashboard) in react.
 
+## Table of Contents
+- [Description](https://github.com/sanginchun/football-dashboard-react#description)
+- [Live Demo](https://github.com/sanginchun/football-dashboard-react#live-demo)
+- [Improvements](https://github.com/sanginchun/football-dashboard-react#improvements)
+- [To Be Updated](https://github.com/sanginchun/football-dashboard-react#to-be-updated)
+
+
 ## Description
 - Football dashboard is a single-page application that shows up-to-date information about football leagues and teams.
 - Used [SportDataApi](https://app.sportdataapi.com/) which is not a public api, so error might occur due to the request limit.
 - Made as a personal project to improve understanding in React.
 
+
 ## Live Demo
 - [https://football-dashboard-react.netlify.app/](https://football-dashboard-react.netlify.app/)
+
 
 ## Improvements
 - Used [semantic ui](https://react.semantic-ui.com/) for more readable, clear UI.
@@ -20,7 +29,7 @@
 
 - Making components reusable
   - [TeamDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/team-detail/TeamDetail.js)
-  ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
+    ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
   - [LeagueDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/league-detail/LeagueDetail.js)
   
 - Refactored placeholder & actual data rendering code
@@ -110,6 +119,7 @@
     });
   }
   ```
+
 
 ## To be updated
 - Router
