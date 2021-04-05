@@ -28,7 +28,7 @@
   ![ui_after](https://user-images.githubusercontent.com/31500012/113541915-1e82b580-961e-11eb-9f8a-9444313b4362.png)
 
 - Making components reusable
-  - [TeamDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/team-detail/TeamDetail.js)
+  - [TeamDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/team-detail/TeamDetail.js) </br>
   ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
   - [LeagueDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/league-detail/LeagueDetail.js)
   
