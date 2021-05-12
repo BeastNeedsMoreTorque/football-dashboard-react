@@ -137,6 +137,10 @@
 
 ## To be updated
 
+# <<<<<<< HEAD
+
+- Redux
+  > > > > > > > 566883fc920205a878cd14ade02322c58fdb806f
 - Router
 - Managing users
 - Multiple custom pages
