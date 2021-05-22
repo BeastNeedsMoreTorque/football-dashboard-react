@@ -1,6 +1,7 @@
 # ⚽ Football Dashboard - React
 
 - Rebuilding [Football Dashboard](https://github.com/sanginchun/football-dashboard) in react.
+- 🚧 Refactoring 🚧
 
 ## Table of Contents
 
@@ -23,7 +24,8 @@
 
 ## Live Demo
 
-- [https://football-dashboard-react.netlify.app/](https://football-dashboard-react.netlify.app/)
+- 🚧 Refactoring 🚧
+- Please visit other versions to see DEMO
 
 ## Improvements
 
