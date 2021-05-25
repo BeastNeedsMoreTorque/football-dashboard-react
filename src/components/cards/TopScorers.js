@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
 import PropTypes from "prop-types";
+import { useParams } from "react-router";
+
+import { model } from "../../model/model";
+import { formatName, formatTeamName, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
 
-import { model } from "../../model/model";
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
-import { formatName, formatTeamName } from "../../others/helper";
+import { Link } from "react-router-dom";
 
 const propTypes = {
   teams: PropTypes.object.isRequired,
@@ -67,7 +69,11 @@ function TopScorersDetail({ teams }) {
               <Table.Cell>{p.pos}</Table.Cell>
               <Table.Cell
                 className="team-cell"
-                children={<TeamDetail {...teamData} displayCode={true} />}
+                children={
+                  <Link to={getTeamURL({ ...teamData })}>
+                    <TeamDetail {...teamData} displayCode={true} />
+                  </Link>
+                }
               />
               <Table.Cell>{formatName(p.player.player_name)}</Table.Cell>
               <Table.Cell>{p.goals.overall}</Table.Cell>

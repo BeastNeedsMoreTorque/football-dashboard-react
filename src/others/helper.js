@@ -55,3 +55,10 @@ export const generateKey = function ({
 
   return key;
 };
+
+export const getTeamURL = function ({ leagueName, name }) {
+  return `/team/${leagueName.replaceAll(" ", "-")}/${name.replaceAll(
+    " ",
+    "-"
+  )}`;
+};

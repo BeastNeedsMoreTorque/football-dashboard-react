@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
 import PropTypes from "prop-types";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
+
 import { model } from "../../model/model";
 
 import { Table } from "semantic-ui-react";
+import { getTeamURL } from "../../others/helper";
 
 import CardPlaceholder from "./CardPlaceholder";
 import TeamDetail from "../team-detail/TeamDetail";
-import { Link } from "react-router-dom";
-import { formatTeamName } from "../../others/helper";
 
 const propTypes = { teams: PropTypes.object.isRequired };
 
@@ -51,15 +52,7 @@ function Standings({ teams }) {
                 className="team-cell"
                 width={4}
                 children={
-                  <Link
-                    to={`/team/${teams[team.team_id].leagueName.replaceAll(
-                      " ",
-                      "-"
-                    )}/${formatTeamName(teams[team.team_id].name).replaceAll(
-                      " ",
-                      "-"
-                    )}`}
-                  >
+                  <Link to={getTeamURL(teams[team.team_id])}>
                     <TeamDetail {...teams[team.team_id]} />
                   </Link>
                 }

@@ -1,7 +1,8 @@
 import React from "react";
-import { Card, Grid } from "semantic-ui-react";
+
 import MainContent from "../components/UI/MainContent";
 import MainHeader from "../components/UI/MainHeader";
+import { Card, Grid } from "semantic-ui-react";
 
 import { style } from "../components/cards/CardTemplate";
 

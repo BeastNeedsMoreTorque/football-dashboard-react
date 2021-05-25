@@ -1,5 +1,6 @@
 import "./App.css";
 import React from "react";
+import { Route, Switch } from "react-router-dom";
 import api from "../api/sportDataApi";
 import { model } from "../model/model.js";
 
@@ -7,7 +8,6 @@ import Sidebar from "./UI/Sidebar";
 import MainLogo from "./UI/MainLogo";
 import MainNav from "./UI/MainNav";
 import MainDisplay from "./UI/MainDisplay";
-import { Route, Switch } from "react-router-dom";
 
 // pages
 import Home from "../pages/Home";
@@ -84,6 +84,7 @@ class App extends React.Component {
                 initialDataLoaded={!!this.state.nav.leagues}
                 loadNav={this.loadNav}
                 teams={this.state.teams}
+                teamsByName={this.state.teamsByName}
               />
             </Route>
             <Route path="/">

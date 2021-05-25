@@ -1,8 +1,0 @@
-.team-next-match-detail .team-cell:hover {
-  cursor: pointer;
-  background-color: whitesmoke;
-}
-
-.team-next-match-detail .team-cell .team-detail {
-  justify-content: center;
-}

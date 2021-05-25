@@ -1,11 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
+
 import { Card, Grid } from "semantic-ui-react";
 
+// League
 import Standings from "./Standings";
 import Matches from "./Matches";
 import TopScorers from "./TopScorers";
 
+// Team
 import TeamStandings from "./TeamStandings";
 import TeamSchedule from "./TeamSchedule";
 import TeamForm from "./TeamForm";
@@ -16,7 +19,7 @@ const propTypes = {
 };
 
 export const style = {
-  card: { minHeight: "280px" },
+  card: { minHeight: "300px" },
   cardHeader: { display: "flex" },
   headerDetail: {
     marginLeft: "auto",
@@ -82,7 +85,7 @@ const cardConfig = {
   },
 };
 
-function CardTemplate({ type, teams }) {
+function CardTemplate({ type, teams, teamsByName }) {
   const { width, title, subType, Content } = cardConfig[type];
 
   return (
@@ -93,7 +96,11 @@ function CardTemplate({ type, teams }) {
             <h3>{title}</h3>
           </Card.Header>
           <Card.Description style={style.cardDescription}>
-            <Content subType={subType} teams={teams} />
+            <Content
+              subType={subType}
+              teams={teams}
+              teamsByName={teamsByName}
+            />
           </Card.Description>
         </Card.Content>
       </Card>

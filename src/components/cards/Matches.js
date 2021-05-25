@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
+
+import { model } from "../../model/model";
+import { formatTeamName, getTeamURL } from "../../others/helper";
+
 import { Table } from "semantic-ui-react";
 
 import TeamDetail from "../team-detail/TeamDetail";
-import DatePicker from "../date-picker/DatePicker";
-import { useParams } from "react-router";
-import { model } from "../../model/model";
 import CardPlaceholder from "./CardPlaceholder";
-import { Link } from "react-router-dom";
-import { formatTeamName } from "../../others/helper";
+import DatePicker from "./date-picker/DatePicker";
 
 const propTypes = {
   subType: PropTypes.string.isRequired,
@@ -88,12 +90,7 @@ function Matches({ subType, teams }) {
                         homeScore > awayScore ? "winner" : ""
                       }`}
                       children={
-                        <Link
-                          to={`/team/${homeTeam.leagueName.replaceAll(
-                            " ",
-                            "-"
-                          )}/${homeTeam.name.replaceAll(" ", "-")}`}
-                        >
+                        <Link to={getTeamURL({ ...homeTeam })}>
                           <TeamDetail {...homeTeam} displayCode={true} />
                         </Link>
                       }
@@ -122,12 +119,7 @@ function Matches({ subType, teams }) {
                         awayScore > homeScore ? "winner" : ""
                       }`}
                       children={
-                        <Link
-                          to={`/team/${awayTeam.leagueName.replaceAll(
-                            " ",
-                            "-"
-                          )}/${awayTeam.name.replaceAll(" ", "-")}`}
-                        >
+                        <Link to={getTeamURL({ ...awayTeam })}>
                           <TeamDetail {...awayTeam} displayCode={true} />
                         </Link>
                       }

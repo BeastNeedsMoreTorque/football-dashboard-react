@@ -1,11 +1,18 @@
 /* util */
+:root {
+  --positive: #ecffff;
+  --negative: rgba(255, 240, 240);
+  --link-hover: whitesmoke;
+  --cell-header: #f9fafb;
+}
+
 table .header tr th {
   position: sticky;
   top: 0;
 }
 
 .team-cell:hover {
-  background-color: whitesmoke;
+  background-color: var(--link-hover);
 }
 
 /* standings */
@@ -26,11 +33,50 @@ table .header tr th {
 }
 
 .matches table td.winner {
-  background-color: #ecffff;
+  background-color: var(--positive);
 }
 
 /* Top Scorers */
-
 .top-scorers .header .goals-overall {
   border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}
+
+/* Team Standings */
+.team-standing {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.team-standing table tr.current {
+  background-color: var(--positive);
+}
+
+/* Team Schedule */
+.team-standing {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.team-schedule .team-cell * {
+  justify-content: center;
+}
+
+/* Team Form */
+.team-form .team-cell * {
+  justify-content: center;
+}
+
+.team-form .header {
+  background-color: var(--cell-header);
+  font-weight: bold;
+}
+
+.team-form .won {
+  background-color: var(--positive);
+}
+.team-form .draw {
+  background-color: var(--cell-header);
+}
+.team-form .lost {
+  background-color: var(--negative);
 }
