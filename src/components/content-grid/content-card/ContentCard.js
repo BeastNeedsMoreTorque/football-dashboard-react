@@ -11,6 +11,33 @@ import TeamNextMatchDetail from "./content-detail/TeamNextMatchDetail";
 import TeamFormDetail from "./content-detail/TeamFormDetail";
 import { generateKey } from "../../../others/helper";
 
+export const style = {
+  card: { minHeight: "280px" },
+  cardHeader: { display: "flex" },
+  headerDetail: {
+    marginLeft: "auto",
+    marginRight: "1rem",
+    fontWeight: "600",
+  },
+  editModeCheckbox: {
+    float: "right",
+    marginLeft: "1rem",
+  },
+  toggleButton: { marginLeft: "auto" },
+  cardDescription: {
+    marginTop: "1.2rem",
+    overflowY: "hidden",
+  },
+  editMode: {
+    opacity: "0.5",
+    pointerEvents: "none",
+  },
+  editModeSelected: {
+    opacity: "1",
+    pointerEvents: "none",
+  },
+};
+
 const propTypes = {
   editMode: PropTypes.bool.isRequired,
   selected: PropTypes.object.isRequired,

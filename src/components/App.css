@@ -1,3 +1,7 @@
 .app {
   position: relative;
 }
+
+a {
+  color: inherit !important;
+}

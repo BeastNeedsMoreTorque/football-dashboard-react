@@ -4,10 +4,6 @@
   align-items: center;
 }
 
-.main-logo:hover {
-  cursor: pointer;
-}
-
 .main-logo > * {
   margin: 0;
   display: inline-block;

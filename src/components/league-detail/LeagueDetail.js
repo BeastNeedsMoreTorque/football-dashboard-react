@@ -1,38 +1,36 @@
-import "./LeagueDetail.css";
 import React from "react";
-import { Flag } from "semantic-ui-react";
 import PropTypes from "prop-types";
+import { Flag } from "semantic-ui-react";
 
 const propTypes = {
-  league_id: PropTypes.number.isRequired,
-  season_id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   countryName: PropTypes.string.isRequired,
-  size: PropTypes.string,
+  header: PropTypes.bool,
 };
 
-function LeagueDetail({ league_id, name, season_id, countryName, size }) {
+const defaultProps = { header: false };
+
+const style = {
+  leagueName: { display: "inline-block", marginLeft: "0.5rem", color: "#333" },
+  header: { fontWeight: "600", fontSize: "1.6rem", marginLeft: "0.8rem" },
+};
+
+function LeagueDetail({ name, countryName, header }) {
   return (
-    <div
-      className="league-detail"
-      data-league-id={league_id}
-      data-season-id={season_id}
-    >
+    <>
       <Flag name={countryName.toLowerCase()} />
       <div
-        className="league-name"
         style={
-          size === "small"
-            ? { marginLeft: "0.2rem", fontSize: "1rem", fontWeight: "normal" }
-            : { marginLeft: "0.5rem" }
+          header ? { ...style.leagueName, ...style.header } : style.leagueName
         }
       >
         {name}
       </div>
-    </div>
+    </>
   );
 }
 
 LeagueDetail.propTypes = propTypes;
+LeagueDetail.defaultProps = defaultProps;
 
 export default LeagueDetail;

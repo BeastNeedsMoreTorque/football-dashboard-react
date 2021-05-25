@@ -6,8 +6,10 @@ import {
 } from "../others/config.js";
 import { getLocalDate, formatTeamName } from "../others/helper.js";
 
+const data = {};
+
 export const model = {
-  async getLeagueData() {
+  async getLeagues() {
     const leagueData = await Promise.all(
       LEAGUE_IDS.map((leagueId) => api.getLeague(leagueId))
     );
@@ -32,62 +34,48 @@ export const model = {
         season_id,
         countryName: name,
       });
+
+      data[leagueData[i].name] = leagueData[i];
     });
 
     return leagueData;
   },
 
-  async getLeagueName(leagueId) {
-    if (!LEAGUE_IDS.includes(+leagueId)) throw new Error("Invalid league ID");
-    const { name: leagueName } = await api.getLeague(leagueId);
-
-    return leagueName;
+  getLeague(leagueName) {
+    return data[leagueName];
   },
 
-  async getTeamName(leagueId, teamId) {
-    if (!LEAGUE_IDS.includes(+leagueId)) throw new Error("Invalid league ID");
-    const { name: teamName } = await api.getTeam(leagueId, teamId);
+  async getTeams(leagueName) {
+    if (!data[leagueName]) throw new Error("Invalid league name");
 
-    return teamName;
-  },
-
-  async getStandingsData(leagueId, seasonId) {
-    const seasons = await api.getSeason(leagueId);
-    const [current] = seasons.filter((season) => season.is_current);
-    if (current.season_id !== +seasonId) throw new Error("Invalid season ID");
-
-    const { standings: standingsData } = await api.getStandings(
-      leagueId,
-      seasonId
+    const standings = await this.getStandings(leagueName);
+    const teamsArr = await Promise.all(
+      standings.map(({ team_id }) =>
+        api.getTeam(data[leagueName].league_id, team_id)
+      )
     );
 
-    return standingsData;
-  },
+    const teams = {};
+    teamsArr.forEach((team) => {
+      // update arr
+      team.name = formatTeamName(team.name);
+      team["leagueName"] = leagueName;
 
-  async getTeamsData(leagueId, standingsData) {
-    const teamsDataArr = await Promise.all(
-      standingsData.map((team) => api.getTeam(leagueId, team.team_id))
-    );
-    teamsDataArr.forEach(
-      (team, i) => (teamsDataArr[i] = Object.assign(team, { leagueId }))
-    );
-
-    const teamsData = {};
-    const teamsDataByName = {};
-
-    teamsDataArr.forEach((team) => {
-      const { team_id, name } = team;
-      team.name = formatTeamName(name);
-      teamsData[team_id] = team;
-      teamsDataByName[name] = team;
-
-      teamsData[team_id].leagueId = leagueId;
-      teamsDataByName[name].leagueId = leagueId;
+      // object
+      teams[team.name] = { ...team, leagueName };
     });
+    teamsArr.sort((a, b) => a.name.localeCompare(b.name));
 
-    teamsDataArr.sort((a, b) => a.name.localeCompare(b.name));
+    data[leagueName].teams = teams;
+    return { teams, teamsArr };
+  },
 
-    return { teamsDataArr, teamsData, teamsDataByName };
+  async getStandings(leagueName) {
+    const { league_id, season_id } = data[leagueName];
+
+    const { standings } = await api.getStandings(league_id, season_id);
+
+    return standings;
   },
 
   async getMatchResultsData({ leagueId, seasonId, teamCode }) {
