@@ -1,0 +1,36 @@
+/* util */
+table .header tr th {
+  position: sticky;
+  top: 0;
+}
+
+.team-cell:hover {
+  background-color: whitesmoke;
+}
+
+/* standings */
+.standings {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* matches */
+.matches {
+  max-height: 300px;
+  margin-top: 1rem;
+  overflow-y: auto;
+}
+
+.matches .team-cell * {
+  justify-content: center;
+}
+
+.matches table td.winner {
+  background-color: #ecffff;
+}
+
+/* Top Scorers */
+
+.top-scorers .header .goals-overall {
+  border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}

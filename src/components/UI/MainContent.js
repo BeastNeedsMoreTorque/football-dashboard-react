@@ -1,4 +1,3 @@
-import "./MainContent.css";
 import React from "react";
 
 function MainContent(props) {

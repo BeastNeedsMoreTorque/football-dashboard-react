@@ -3,10 +3,10 @@ import React from "react";
 import api from "../api/sportDataApi";
 import { model } from "../model/model.js";
 
-import Sidebar from "./sidebar/Sidebar";
-import MainLogo from "./main-logo/MainLogo";
-import MainNav from "./main-nav/MainNav";
-import MainDisplay from "./main-display/MainDisplay";
+import Sidebar from "./UI/Sidebar";
+import MainLogo from "./UI/MainLogo";
+import MainNav from "./UI/MainNav";
+import MainDisplay from "./UI/MainDisplay";
 import { Route, Switch } from "react-router-dom";
 
 // pages
@@ -23,6 +23,7 @@ class App extends React.Component {
       nav: { leagues: null, teams: null, loading: true },
       league: null,
       teams: null,
+      teamsByName: null,
       editMode: false,
     };
   }
@@ -34,15 +35,25 @@ class App extends React.Component {
     this.setState({ nav: { ...this.state.nav, leagues, loading: false } });
   }
 
-  loadNav = async (leagueName) => {
-    this.setState({ nav: { ...this.state.nav, loading: true } });
+  loadNav = async (urlLeagueName) => {
+    this.setState({
+      nav: { ...this.state.nav, loading: true },
+      teams: null,
+      teamsByName: null,
+    });
+    const leagueName = urlLeagueName.replaceAll("-", " ");
 
     const league = model.getLeague(leagueName);
-    const { teamsArr: navTeams, teams } = await model.getTeams(leagueName);
+    const {
+      teamsArr: navTeams,
+      teams,
+      teamsByName,
+    } = await model.getTeams(leagueName);
 
     this.setState({
       league,
       teams,
+      teamsByName,
       nav: { ...this.state.nav, teams: navTeams, loading: false },
     });
   };
@@ -65,6 +76,7 @@ class App extends React.Component {
                 loadNav={this.loadNav}
                 league={this.state.league}
                 teams={this.state.teams}
+                teamsByName={this.state.teamsByName}
               />
             </Route>
             <Route path="/team/:leagueName/:teamName">

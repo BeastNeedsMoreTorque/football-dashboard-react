@@ -1,4 +1,3 @@
-import "./MainDisplay.css";
 import React from "react";
 
 function MainDisplay(props) {

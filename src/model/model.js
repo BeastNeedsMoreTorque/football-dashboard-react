@@ -1,9 +1,5 @@
 import api from "../api/sportDataApi";
-import {
-  LEAGUE_IDS,
-  MAX_TOP_SCORERS,
-  MAX_FORM_RESULTS,
-} from "../others/config.js";
+import { LEAGUE_IDS, MAX_TOP_SCORERS } from "../others/config.js";
 import { getLocalDate, formatTeamName } from "../others/helper.js";
 
 const data = {};
@@ -28,10 +24,11 @@ export const model = {
     });
 
     currentSeasons.forEach((league, i) => {
-      const { season_id } = league;
+      const { season_id, end_date } = league;
       const { name } = countryData[i];
       leagueData[i] = Object.assign(leagueData[i], {
         season_id,
+        end_date,
         countryName: name,
       });
 
@@ -56,94 +53,103 @@ export const model = {
     );
 
     const teams = {};
+    const teamsByName = {};
     teamsArr.forEach((team) => {
       // update arr
       team.name = formatTeamName(team.name);
       team["leagueName"] = leagueName;
 
       // object
-      teams[team.name] = { ...team, leagueName };
+      teams[team.team_id] = { ...team, leagueName };
+      teamsByName[team.name] = { ...team, leagueName };
     });
     teamsArr.sort((a, b) => a.name.localeCompare(b.name));
 
     data[leagueName].teams = teams;
-    return { teams, teamsArr };
+    return { teams, teamsByName, teamsArr };
   },
 
   async getStandings(leagueName) {
     const { league_id, season_id } = data[leagueName];
-
     const { standings } = await api.getStandings(league_id, season_id);
 
     return standings;
   },
 
-  async getMatchResultsData({ leagueId, seasonId, teamCode }) {
-    const isMonth = teamCode ? true : false;
-    const matchesData = await api.getMatchResults(leagueId, seasonId, isMonth);
+  async getMatchResults(leagueName) {
+    try {
+      const leagueEnded =
+        new Date(Date.now()) > new Date(data[leagueName].end_date);
 
-    // filter status
-    let filtered = matchesData.filter((match) => match.status === "finished");
+      const { league_id, season_id } = data[leagueName];
+      const matches = await api.getMatchResults(
+        league_id,
+        season_id,
+        leagueEnded ? data[leagueName].end_date : new Date(Date.now())
+      );
 
-    // filter by team
-    if (teamCode) {
-      filtered = filtered.filter((match) => {
-        return (
-          match.home_team.short_code === teamCode ||
-          match.away_team.short_code === teamCode
-        );
-      });
+      let filtered = matches.filter(
+        (match) => match.status === "finished" && match.stage.stage_id === 1
+      );
+
+      const matchesSorted = filtered
+        .map((match) => {
+          const { match_start_iso } = match;
+          match.match_start = getLocalDate(match_start_iso);
+          return match;
+        })
+        .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
+
+      return matchesSorted;
+    } catch (err) {
+      switch (err) {
+        case 403:
+          return [];
+        default:
+          console.error(err);
+          return [];
+      }
     }
-
-    // get local time & sort
-    const matchesSorted = filtered
-      .map((match) => {
-        const { match_start_iso } = match;
-        match.match_start = getLocalDate(match_start_iso);
-        return match;
-      })
-      .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
-
-    if (teamCode && matchesSorted.length > MAX_FORM_RESULTS) {
-      matchesSorted.splice(0, matchesSorted.length - MAX_FORM_RESULTS);
-    }
-
-    return matchesSorted;
   },
 
-  async getMatchUpcomingData({ leagueId, seasonId, teamCode }) {
-    const isMonth = teamCode ? true : false;
-    const matchesData = await api.getMatchUpcoming(leagueId, seasonId, isMonth);
+  async getMatchUpcoming(leagueName) {
+    try {
+      const leagueEnded =
+        new Date(Date.now()) > new Date(data[leagueName].end_date);
+      if (leagueEnded) return [];
 
-    // filter status
-    let filtered = matchesData.filter(
-      (match) => match.status === "notstarted" || match.status === ""
-    );
+      const { league_id, season_id } = data[leagueName];
+      const matches = await api.getMatchUpcoming(league_id, season_id);
 
-    // filter by team
-    if (teamCode) {
-      filtered = filtered.filter((match) => {
-        return (
-          match.home_team.short_code === teamCode ||
-          match.away_team.short_code === teamCode
-        );
-      });
+      let filtered = matches.filter(
+        (match) =>
+          (match.status === "notstarted" || match.status === "") &&
+          match.stage.state_id === 1
+      );
+
+      const matchesSorted = filtered
+        .map((match) => {
+          const { match_start_iso } = match;
+          match.match_start = getLocalDate(match_start_iso);
+          return match;
+        })
+        .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
+
+      return matchesSorted;
+    } catch (err) {
+      switch (err) {
+        case 403:
+          return [];
+        default:
+          console.error(err);
+          return [];
+      }
     }
-
-    // get local time & sort
-    const matchesSorted = filtered
-      .map((match) => {
-        const { match_start_iso } = match;
-        match.match_start = getLocalDate(match_start_iso);
-        return match;
-      })
-      .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
-
-    return matchesSorted;
   },
 
-  async getTopScorersData(leagueId, seasonId) {
-    const topScorers = await api.getTopScorers(leagueId, seasonId);
+  async getTopScorers(leagueName) {
+    const { league_id, season_id } = data[leagueName];
+    const topScorers = await api.getTopScorers(league_id, season_id);
 
     // find index
     let index = 0;

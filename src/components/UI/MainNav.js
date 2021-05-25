@@ -1,4 +1,3 @@
-import "./MainNav.css";
 import React from "react";
 
 import { Menu, Loader, Dropdown } from "semantic-ui-react";
@@ -25,7 +24,7 @@ function MainNav({ loading, leagues, teams }) {
             {leagues?.map((league) => (
               <Dropdown.Item
                 as={Link}
-                to={`/league/${league.name}`}
+                to={`/league/${league.name.replaceAll(" ", "-")}`}
                 key={league.league_id}
               >
                 <LeagueDetail {...league} />
@@ -38,7 +37,10 @@ function MainNav({ loading, leagues, teams }) {
             {teams?.map((team) => (
               <Dropdown.Item
                 as={Link}
-                to={`/team/${team.leagueName}/${team.name}`}
+                to={`/team/${team.leagueName.replaceAll(
+                  " ",
+                  "-"
+                )}/${team.name.replaceAll(" ", "-")}`}
                 key={team.team_id}
               >
                 <TeamDetail {...team} />

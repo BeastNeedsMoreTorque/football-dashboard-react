@@ -1,3 +1,6 @@
+@import "./UI/css/UI.css";
+@import "./cards//css/Cards.css";
+
 .app {
   position: relative;
 }

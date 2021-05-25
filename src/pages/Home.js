@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, Grid } from "semantic-ui-react";
-import MainContent from "../components/main-content/MainContent";
-import MainHeader from "../components/main-header/MainHeader";
+import MainContent from "../components/UI/MainContent";
+import MainHeader from "../components/UI/MainHeader";
 
-import { style } from "../components/content-grid/content-card/ContentCard";
+import { style } from "../components/cards/CardTemplate";
 
 const listStyles = {
   ul: {

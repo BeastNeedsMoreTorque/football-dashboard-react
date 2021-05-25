@@ -1,19 +1,38 @@
-import "./TopScorersDetail.css";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import PropTypes from "prop-types";
+
 import { Table } from "semantic-ui-react";
-import TeamDetail from "../../../team-detail/TeamDetail";
-import { formatName } from "../../../../others/helper.js";
+
+import { model } from "../../model/model";
+import TeamDetail from "../team-detail/TeamDetail";
+import CardPlaceholder from "./CardPlaceholder";
+import { formatName, formatTeamName } from "../../others/helper";
 
 const propTypes = {
-  data: PropTypes.object.isRequired,
+  teams: PropTypes.object.isRequired,
 };
 
-function TopScorersDetail({ data }) {
-  const { topScorersData, teamsDataByName } = data;
+function TopScorersDetail({ teams }) {
+  const [topScorersData, setTopScorersData] = useState(null);
+  const { leagueName } = useParams();
+
+  useEffect(() => {
+    if (!topScorersData) getData();
+
+    async function getData() {
+      const topScorers = await model.getTopScorers(
+        leagueName.replaceAll("-", " ")
+      );
+
+      setTopScorersData(topScorers);
+    }
+  }, [topScorersData, leagueName]);
+
+  if (!topScorersData) return <CardPlaceholder />;
 
   return (
-    <Table className="top-scorers-detail" celled={true} size="small">
+    <Table className="top-scorers" celled={true} size="small">
       <Table.Header className="header">
         <Table.Row>
           <Table.HeaderCell width={1} rowSpan="2">
@@ -42,7 +61,7 @@ function TopScorersDetail({ data }) {
       </Table.Header>
       <Table.Body>
         {topScorersData.map((p, i) => {
-          const teamData = teamsDataByName[p.team.team_name];
+          const teamData = teams[formatTeamName(p.team.team_name)];
           return (
             <Table.Row key={i}>
               <Table.Cell>{p.pos}</Table.Cell>

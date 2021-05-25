@@ -1,6 +1,0 @@
-.main-display {
-  position: absolute;
-  left: 300px;
-  width: calc(100% - 300px);
-  padding: 1rem 4rem 3rem;
-}

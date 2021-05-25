@@ -1,9 +1,0 @@
-.standings-detail .header tr th {
-  position: sticky;
-  top: 0;
-}
-
-.standings-detail .team-cell:hover {
-  cursor: pointer;
-  background-color: whitesmoke;
-}

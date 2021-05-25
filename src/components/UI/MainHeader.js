@@ -1,4 +1,3 @@
-import "./MainHeader.css";
 import React from "react";
 
 function MainHeader(props) {

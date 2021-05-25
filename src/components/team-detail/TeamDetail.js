@@ -5,11 +5,12 @@ const propTypes = {
   logo: PropTypes.string.isRequired,
   short_code: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
+  displayCode: PropTypes.bool,
   header: PropTypes.bool,
   style: PropTypes.object,
 };
 
-const defaultProps = { header: false, style: {} };
+const defaultProps = { displayCode: false, header: false, style: {} };
 
 const style = {
   root: { display: "flex", alignItems: "center" },
@@ -19,7 +20,14 @@ const style = {
   headerLogo: { width: "2rem", marginRight: "1.5rem" },
 };
 
-function TeamDetail({ logo, short_code, name, header, style: addStyle }) {
+function TeamDetail({
+  logo,
+  short_code,
+  name,
+  displayCode,
+  header,
+  style: addStyle,
+}) {
   return (
     <div style={{ ...style.root, ...addStyle }}>
       <img
@@ -31,7 +39,7 @@ function TeamDetail({ logo, short_code, name, header, style: addStyle }) {
       <div
         style={header ? { ...style.teamName, ...style.header } : style.teamName}
       >
-        {name}
+        {displayCode ? short_code : name}
       </div>
     </div>
   );
