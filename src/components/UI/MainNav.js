@@ -1,10 +1,17 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { Menu, Loader, Dropdown } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 
 import LeagueDetail from "../league-detail/LeagueDetail";
 import TeamDetail from "../team-detail/TeamDetail";
+
+const propTypes = {
+  loading: PropTypes.bool.isRequired,
+  leagues: PropTypes.arrayOf(PropTypes.object),
+  teams: PropTypes.arrayOf(PropTypes.object),
+};
 
 const style = {
   mainMenu: { position: "relative" },
@@ -52,5 +59,7 @@ function MainNav({ loading, leagues, teams }) {
     </nav>
   );
 }
+
+MainNav.propTypes = propTypes;
 
 export default MainNav;

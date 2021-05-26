@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 
 import MainHeader from "../components/UI/MainHeader";
@@ -7,6 +8,13 @@ import TeamDetail from "../components/team-detail/TeamDetail";
 import CardTemplate from "../components/cards/CardTemplate";
 import { Grid, Loader } from "semantic-ui-react";
 import { useNames } from "../hooks/useNames";
+
+const propTypes = {
+  initialDataLoaded: PropTypes.bool.isRequired,
+  loadNav: PropTypes.func.isRequired,
+  teams: PropTypes.object,
+  teamsByName: PropTypes.object,
+};
 
 function Team({ initialDataLoaded, loadNav, teams, teamsByName }) {
   const { leagueName, teamName } = useNames(useParams());
@@ -36,5 +44,7 @@ function Team({ initialDataLoaded, loadNav, teams, teamsByName }) {
     </>
   );
 }
+
+Team.propTypes = propTypes;
 
 export default Team;

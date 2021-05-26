@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
-import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 import { formatName, formatTeamName, getTeamURL } from "../../others/helper";
@@ -16,19 +15,20 @@ const propTypes = {
   teams: PropTypes.object.isRequired,
 };
 
-function TopScorersDetail({ teams }) {
+function TopScorers({ teams }) {
   const [topScorersData, setTopScorersData] = useState(null);
-  const { leagueName } = useNames(useParams());
+  const { leagueName } = useParams();
 
   useEffect(() => {
     let ignore = false;
-
     getData();
 
     return () => (ignore = true);
 
     async function getData() {
-      const topScorers = await model.getTopScorers(leagueName);
+      const topScorers = await model.getTopScorers(
+        leagueName.replaceAll("-", " ")
+      );
 
       if (!ignore) setTopScorersData(topScorers);
     }
@@ -97,6 +97,6 @@ function TopScorersDetail({ teams }) {
   );
 }
 
-TopScorersDetail.propTypes = propTypes;
+TopScorers.propTypes = propTypes;
 
-export default TopScorersDetail;
+export default TopScorers;

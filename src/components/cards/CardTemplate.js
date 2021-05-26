@@ -16,6 +16,7 @@ import TeamForm from "./TeamForm";
 const propTypes = {
   type: PropTypes.string.isRequired,
   teams: PropTypes.object,
+  teamsByName: PropTypes.object,
 };
 
 export const style = {
