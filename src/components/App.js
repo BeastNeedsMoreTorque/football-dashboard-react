@@ -35,13 +35,12 @@ class App extends React.Component {
     this.setState({ nav: { ...this.state.nav, leagues, loading: false } });
   }
 
-  loadNav = async (urlLeagueName) => {
+  loadNav = async (leagueName) => {
     this.setState({
       nav: { ...this.state.nav, loading: true },
       teams: null,
       teamsByName: null,
     });
-    const leagueName = urlLeagueName.replaceAll("-", " ");
 
     const league = model.getLeague(leagueName);
     const {

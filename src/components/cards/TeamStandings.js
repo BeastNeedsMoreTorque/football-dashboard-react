@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 import { getTeamURL } from "../../others/helper";
@@ -21,25 +22,25 @@ const config = { tableHeader: ["#", "Team", "Points", "Diff", "Played", "W", "D"
 
 function TeamStanding({ teams, teamsByName }) {
   const [standingsData, setStandingsData] = useState(null);
+  const { leagueName, teamName } = useNames(useParams());
 
-  const { leagueName, teamName } = useParams();
   const currentTeam = standingsData?.filter(
-    (team) =>
-      team.team_id === teamsByName[teamName.replaceAll("-", " ")].team_id
+    (team) => team.team_id === teamsByName[teamName].team_id
   )[0];
   const currentRef = useRef(null);
 
   useEffect(() => {
-    if (!standingsData) getData();
+    let ignore = false;
+    getData();
+
+    return () => (ignore = true);
 
     async function getData() {
-      const standings = await model.getStandings(
-        leagueName.replaceAll("-", " ")
-      );
+      const standings = await model.getStandings(leagueName);
 
-      setStandingsData(standings);
+      if (!ignore) setStandingsData(standings);
     }
-  }, [standingsData, leagueName]);
+  }, [leagueName]);
 
   useEffect(() => {
     if (currentTeam) {

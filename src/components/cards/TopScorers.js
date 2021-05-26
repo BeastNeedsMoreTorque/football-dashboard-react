@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
+import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 import { formatName, formatTeamName, getTeamURL } from "../../others/helper";
@@ -17,19 +18,21 @@ const propTypes = {
 
 function TopScorersDetail({ teams }) {
   const [topScorersData, setTopScorersData] = useState(null);
-  const { leagueName } = useParams();
+  const { leagueName } = useNames(useParams());
 
   useEffect(() => {
-    if (!topScorersData) getData();
+    let ignore = false;
+
+    getData();
+
+    return () => (ignore = true);
 
     async function getData() {
-      const topScorers = await model.getTopScorers(
-        leagueName.replaceAll("-", " ")
-      );
+      const topScorers = await model.getTopScorers(leagueName);
 
-      setTopScorersData(topScorers);
+      if (!ignore) setTopScorersData(topScorers);
     }
-  }, [topScorersData, leagueName]);
+  }, [leagueName]);
 
   if (!topScorersData) return <CardPlaceholder />;
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 import { formatTeamName, formatDate, getTeamURL } from "../../others/helper";
@@ -21,20 +22,20 @@ const config = {
 
 function TeamSchedule({ teams }) {
   const [matchData, setMatchData] = useState(null);
-  const { leagueName, teamName } = useParams();
-  const currentTeamName = teamName.replaceAll("-", " ");
+  const { leagueName, teamName } = useNames(useParams());
 
   useEffect(() => {
-    if (!matchData) getData();
+    let ignore = false;
+    getData();
+
+    return () => (ignore = true);
 
     async function getData() {
-      const matches = await model.getMatchUpcoming(
-        leagueName.replaceAll("-", " ")
-      );
+      const matches = await model.getMatchUpcoming(leagueName);
 
-      setMatchData(matches);
+      if (!ignore) setMatchData(matches);
     }
-  }, [leagueName, currentTeamName, matchData]);
+  }, [leagueName]);
 
   if (!matchData) return <CardPlaceholder />;
 
@@ -55,12 +56,11 @@ function TeamSchedule({ teams }) {
           {matchData
             .filter(
               (match) =>
-                formatTeamName(match.home_team.name) === currentTeamName ||
-                formatTeamName(match.away_team.name) === currentTeamName
+                formatTeamName(match.home_team.name) === teamName ||
+                formatTeamName(match.away_team.name) === teamName
             )
             .map((match, i) => {
-              const isHome =
-                formatTeamName(match.home_team.name) === currentTeamName;
+              const isHome = formatTeamName(match.home_team.name) === teamName;
               const opponentName = isHome
                 ? formatTeamName(match.away_team.name)
                 : formatTeamName(match.home_team.name);

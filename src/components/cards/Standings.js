@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 
@@ -18,19 +19,21 @@ const config = { tableHeader: ["#", "Team", "Points", "Played", "W", "D", "L", "
 
 function Standings({ teams }) {
   const [standingsData, setStandingsData] = useState(null);
-  const { leagueName } = useParams();
+  const { leagueName } = useNames(useParams());
 
   useEffect(() => {
-    if (!standingsData) getData();
+    let ignore = false;
+
+    getData();
+
+    return () => (ignore = true);
 
     async function getData() {
-      const standings = await model.getStandings(
-        leagueName.replaceAll("-", " ")
-      );
+      const standings = await model.getStandings(leagueName);
 
-      setStandingsData(standings);
+      if (!ignore) setStandingsData(standings);
     }
-  }, [standingsData, leagueName]);
+  }, [leagueName]);
 
   if (!standingsData) return <CardPlaceholder />;
 

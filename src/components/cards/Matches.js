@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
 import { formatTeamName, getTeamURL } from "../../others/helper";
@@ -33,27 +34,36 @@ function Matches({ subType, teams }) {
   const [matchData, setMatchData] = useState(null);
   const [uniqueDates, setUniqueDates] = useState([]);
   const [date, setDate] = useState(null);
-  const { leagueName } = useParams();
+  const { leagueName } = useNames(useParams());
 
   useEffect(() => {
-    if (!matchData) getData();
+    let ignore = false;
+
+    getData();
+
+    return () => (ignore = true);
 
     async function getData() {
       const matches =
         subType === "result"
-          ? await model.getMatchResults(leagueName.replaceAll("-", " "))
-          : await model.getMatchUpcoming(leagueName.replaceAll("-", " "));
+          ? await model.getMatchResults(leagueName)
+          : await model.getMatchUpcoming(leagueName);
 
-      setUniqueDates(
-        getUniqueDates(
-          matches.map((match) => match.match_start),
-          subType
-        )
-      );
-      setMatchData(matches);
-      setDate(uniqueDates[0]);
+      if (!ignore) {
+        setMatchData(matches);
+        setUniqueDates(
+          getUniqueDates(
+            matches.map((match) => match.match_start),
+            subType
+          )
+        );
+      }
     }
-  }, [subType, matchData, uniqueDates, leagueName]);
+  }, [subType, leagueName]);
+
+  useEffect(() => {
+    if (uniqueDates.length) setDate(uniqueDates[0]);
+  }, [uniqueDates]);
 
   if (!matchData) return <CardPlaceholder />;
 

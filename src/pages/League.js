@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useNames } from "../hooks/useNames";
 
 import MainHeader from "../components/UI/MainHeader";
 import MainContent from "../components/UI/MainContent";
@@ -8,13 +9,13 @@ import CardTemplate from "../components/cards/CardTemplate";
 import { Grid, Loader } from "semantic-ui-react";
 
 function League({ initialDataLoaded, loadNav, league, teams, teamsByName }) {
-  const { leagueName } = useParams();
+  const { leagueName } = useNames(useParams());
 
   useEffect(() => {
     if (initialDataLoaded) loadNav(leagueName);
   }, [initialDataLoaded, loadNav, leagueName]);
 
-  if (!teams) return <Loader size="large" />;
+  if (!teams) return <Loader size="large" active={true} />;
 
   return (
     <>
