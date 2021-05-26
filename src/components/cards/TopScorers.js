@@ -10,6 +10,7 @@ import { Table } from "semantic-ui-react";
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
 import { Link } from "react-router-dom";
+import { useNames } from "../../hooks/useNames";
 
 const propTypes = {
   teams: PropTypes.object.isRequired,
@@ -17,7 +18,7 @@ const propTypes = {
 
 function TopScorers({ teams }) {
   const [topScorersData, setTopScorersData] = useState(null);
-  const { leagueName } = useParams();
+  const { leagueName } = useNames(useParams());
 
   useEffect(() => {
     let ignore = false;
@@ -26,9 +27,7 @@ function TopScorers({ teams }) {
     return () => (ignore = true);
 
     async function getData() {
-      const topScorers = await model.getTopScorers(
-        leagueName.replaceAll("-", " ")
-      );
+      const topScorers = await model.getTopScorers(leagueName);
 
       if (!ignore) setTopScorersData(topScorers);
     }
