@@ -62,3 +62,12 @@ export const getTeamURL = function ({ leagueName, name }) {
     "-"
   )}`;
 };
+
+export const getNames = function (params) {
+  const { leagueName, teamName } = params;
+
+  return {
+    leagueName: leagueName.replaceAll("-", " "),
+    teamName: teamName?.replaceAll("-", " "),
+  };
+};

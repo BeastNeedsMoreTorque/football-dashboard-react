@@ -21,8 +21,12 @@ function TopScorers({ teams }) {
   const { leagueName } = useNames(useParams());
 
   useEffect(() => {
+    console.log("effect");
     let ignore = false;
-    getData();
+    if (!topScorersData) {
+      console.log("fetch");
+      getData();
+    }
 
     return () => (ignore = true);
 
@@ -31,7 +35,7 @@ function TopScorers({ teams }) {
 
       if (!ignore) setTopScorersData(topScorers);
     }
-  }, [leagueName]);
+  }, [leagueName, topScorersData]);
 
   if (!topScorersData) return <CardPlaceholder />;
 

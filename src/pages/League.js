@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
-import { useNames } from "../hooks/useNames";
+import { getNames } from "../others/helper";
+
+import { useLeague } from "../model/selectors";
 
 import MainHeader from "../components/UI/MainHeader";
 import MainContent from "../components/UI/MainContent";
@@ -11,32 +13,46 @@ import { Grid, Loader } from "semantic-ui-react";
 
 const propTypes = {
   initialDataLoaded: PropTypes.bool.isRequired,
-  loadNav: PropTypes.func.isRequired,
-  league: PropTypes.object,
-  teams: PropTypes.object,
-  teamsByName: PropTypes.object,
+  loadTeams: PropTypes.func.isRequired,
 };
 
-function League({ initialDataLoaded, loadNav, league, teams, teamsByName }) {
-  const { leagueName } = useNames(useParams());
+function League({ initialDataLoaded, loadTeams }) {
+  const { leagueName } = getNames(useParams());
+  const league = useLeague(leagueName);
 
   useEffect(() => {
-    if (initialDataLoaded) loadNav(leagueName);
-  }, [initialDataLoaded, loadNav, leagueName]);
+    if (initialDataLoaded) loadTeams(leagueName);
+  }, [initialDataLoaded, leagueName, loadTeams]);
 
-  if (!teams) return <Loader size="large" active={true} />;
+  if (!league) return <Loader size="large" active={true} />;
 
   return (
     <>
       <MainHeader>
-        {league ? <LeagueDetail {...league} header={true} /> : null}
+        <LeagueDetail
+          name={league.name}
+          countryName={league.countryName}
+          header={true}
+        />
       </MainHeader>
       <MainContent>
         <Grid>
-          <CardTemplate type="standings" teams={teams} />
-          <CardTemplate type="matchResult" teams={teamsByName} />
-          <CardTemplate type="matchUpcoming" teams={teamsByName} />
-          <CardTemplate type="topScorers" teams={teamsByName} />
+          <CardTemplate
+            key={`${league.league_id}-standings`}
+            type="standings"
+            currentLeague={leagueName}
+          />
+          <CardTemplate
+            key={`${league.league_id}-result`}
+            type="matchResult"
+            currentLeague={leagueName}
+          />
+          <CardTemplate
+            key={`${league.league_id}-upcoming`}
+            type="matchUpcoming"
+            currentLeague={leagueName}
+          />
+          {/* <CardTemplate key={`${league.league_id}-top`} type="topScorers" currentLeague={leagueName} /> */}
         </Grid>
       </MainContent>
     </>

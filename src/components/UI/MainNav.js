@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { useLeagues, useTeams } from "../../model/selectors";
 
 import { Menu, Loader, Dropdown } from "semantic-ui-react";
 import { Link } from "react-router-dom";
@@ -9,8 +10,7 @@ import TeamDetail from "../team-detail/TeamDetail";
 
 const propTypes = {
   loading: PropTypes.bool.isRequired,
-  leagues: PropTypes.arrayOf(PropTypes.object),
-  teams: PropTypes.arrayOf(PropTypes.object),
+  currentLeague: PropTypes.string.isRequired,
 };
 
 const style = {
@@ -18,7 +18,10 @@ const style = {
   teamMenu: { maxHeight: "300px", overflowY: "scroll" },
 };
 
-function MainNav({ loading, leagues, teams }) {
+function MainNav({ loading, currentLeague }) {
+  const leagues = useLeagues();
+  const { teamsArr: teams } = useTeams(currentLeague);
+
   return (
     <nav className="main-nav">
       <Menu vertical={true} style={style.mainMenu} size="large">
@@ -34,7 +37,10 @@ function MainNav({ loading, leagues, teams }) {
                 to={`/league/${league.name.replaceAll(" ", "-")}`}
                 key={league.league_id}
               >
-                <LeagueDetail {...league} />
+                <LeagueDetail
+                  name={league.name}
+                  countryName={league.countryName}
+                />
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>

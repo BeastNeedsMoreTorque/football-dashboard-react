@@ -15,8 +15,7 @@ import TeamForm from "./TeamForm";
 
 const propTypes = {
   type: PropTypes.string.isRequired,
-  teams: PropTypes.object,
-  teamsByName: PropTypes.object,
+  currentLeague: PropTypes.string.isRequired,
 };
 
 export const style = {
@@ -86,22 +85,18 @@ const cardConfig = {
   },
 };
 
-function CardTemplate({ type, teams, teamsByName }) {
+function CardTemplate({ type, currentLeague }) {
   const { width, title, subType, Content } = cardConfig[type];
 
   return (
     <Grid.Column width={width}>
-      <Card fluid={true} style={style.card}>
+      <Card as="article" fluid={true} style={style.card}>
         <Card.Content>
           <Card.Header style={style.cardHeader}>
             <h3>{title}</h3>
           </Card.Header>
           <Card.Description style={style.cardDescription}>
-            <Content
-              subType={subType}
-              teams={teams}
-              teamsByName={teamsByName}
-            />
+            <Content subType={subType} currentLeague={currentLeague} />
           </Card.Description>
         </Card.Content>
       </Card>

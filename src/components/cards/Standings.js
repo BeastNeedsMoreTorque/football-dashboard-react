@@ -1,41 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
-
-import { model } from "../../model/model";
 
 import { Table } from "semantic-ui-react";
 import { getTeamURL } from "../../others/helper";
 
 import CardPlaceholder from "./CardPlaceholder";
 import TeamDetail from "../team-detail/TeamDetail";
+import { useTeams, useStandings } from "../../model/selectors";
 
-const propTypes = { teams: PropTypes.object.isRequired };
+const propTypes = { currentLeague: PropTypes.string.isRequired };
 
 // prettier-ignore
 const config = { tableHeader: ["#", "Team", "Points", "Played", "W", "D", "L", "GS", "GA", "GD"] };
 
-function Standings({ teams }) {
-  const [standingsData, setStandingsData] = useState(null);
-  const { leagueName } = useNames(useParams());
+function Standings({ currentLeague }) {
+  const standings = useStandings(currentLeague);
+  const { teams } = useTeams(currentLeague);
 
-  useEffect(() => {
-    let ignore = false;
-
-    getData();
-
-    return () => (ignore = true);
-
-    async function getData() {
-      const standings = await model.getStandings(leagueName);
-
-      if (!ignore) setStandingsData(standings);
-    }
-  }, [leagueName]);
-
-  if (!standingsData) return <CardPlaceholder />;
+  if (!standings || !teams) return <CardPlaceholder />;
 
   return (
     <div className="standings">
@@ -48,7 +31,7 @@ function Standings({ teams }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {standingsData?.map((team, i) => (
+          {standings.map((team, i) => (
             <Table.Row key={i}>
               <Table.Cell>{team.position}</Table.Cell>
               <Table.Cell

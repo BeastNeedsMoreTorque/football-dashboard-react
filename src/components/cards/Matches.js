@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
+import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
@@ -15,7 +14,7 @@ import DatePicker from "./date-picker/DatePicker";
 
 const propTypes = {
   subType: PropTypes.string.isRequired,
-  teams: PropTypes.object.isRequired,
+  currentLeague: PropTypes.string.isRequired,
 };
 
 const config = {
@@ -30,49 +29,51 @@ const getUniqueDates = function (dateArr, subType) {
   return unique;
 };
 
-function Matches({ subType, teams }) {
-  const [matchData, setMatchData] = useState(null);
-  const [uniqueDates, setUniqueDates] = useState([]);
-  const [date, setDate] = useState(null);
-  const { leagueName } = useNames(useParams());
+function Matches({ subType, currentLeague }) {
+  const [status, setStatus] = useState(
+    useMatchStatus(currentLeague)?.[subType]
+  );
+  const matches = useMatches(currentLeague)?.[subType];
+  const { teamsByName: teams } = useTeams(currentLeague);
+
+  const [date, setDate] = useState("");
 
   useEffect(() => {
-    let ignore = false;
-
-    getData();
-
-    return () => (ignore = true);
+    if (status === "IDLE") getData();
 
     async function getData() {
-      const matches =
-        subType === "result"
-          ? await model.getMatchResults(leagueName)
-          : await model.getMatchUpcoming(leagueName);
+      subType === "result"
+        ? await model.getMatchResults(currentLeague)
+        : await model.getMatchUpcoming(currentLeague);
 
-      if (!ignore) {
-        setMatchData(matches);
-        setUniqueDates(
-          getUniqueDates(
-            matches.map((match) => match.match_start),
-            subType
-          )
-        );
-      }
+      setStatus("UPDATED");
     }
-  }, [subType, leagueName]);
+  }, [subType, status, currentLeague]);
 
   useEffect(() => {
-    if (uniqueDates.length) setDate(uniqueDates[0]);
-  }, [uniqueDates]);
+    if (matches?.length) {
+      setDate(
+        getUniqueDates(
+          matches.map((match) => match.match_start),
+          subType
+        )[0]
+      );
+    }
+  }, [matches, subType]);
 
-  if (!matchData) return <CardPlaceholder />;
+  if (!matches || !teams) return <CardPlaceholder />;
 
-  if (!matchData.length)
-    return <h3 style={{ marginTop: "1rem" }}>No Matches</h3>;
+  if (!matches.length) return <h3 style={{ marginTop: "1rem" }}>No Matches</h3>;
 
   return (
     <>
-      <DatePicker dateArr={uniqueDates} onChange={setDate} />
+      <DatePicker
+        dateArr={getUniqueDates(
+          matches.map((match) => match.match_start),
+          subType
+        )}
+        onChange={setDate}
+      />
       <div className="matches">
         <Table celled={true} size="small" textAlign="center">
           <Table.Header className="header">
@@ -85,7 +86,7 @@ function Matches({ subType, teams }) {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {matchData
+            {matches
               .filter((match) => match.match_start.slice(0, 10) === date)
               .map((match, i) => {
                 const homeTeam = teams[formatTeamName(match.home_team.name)];

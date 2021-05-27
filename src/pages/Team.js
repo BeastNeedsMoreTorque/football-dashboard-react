@@ -1,37 +1,39 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
+import { useLeague, useTeams } from "../model/selectors";
 
 import MainHeader from "../components/UI/MainHeader";
 import MainContent from "../components/UI/MainContent";
 import TeamDetail from "../components/team-detail/TeamDetail";
 import CardTemplate from "../components/cards/CardTemplate";
 import { Grid, Loader } from "semantic-ui-react";
-import { useNames } from "../hooks/useNames";
+
+import { getNames } from "../others/helper";
 
 const propTypes = {
   initialDataLoaded: PropTypes.bool.isRequired,
-  loadNav: PropTypes.func.isRequired,
-  teams: PropTypes.object,
-  teamsByName: PropTypes.object,
+  loadTeams: PropTypes.func.isRequired,
 };
 
-function Team({ initialDataLoaded, loadNav, teams, teamsByName }) {
-  const { leagueName, teamName } = useNames(useParams());
+function Team({ initialDataLoaded, loadTeams }) {
+  const { leagueName, teamName } = getNames(useParams());
+  const league = useLeague(leagueName);
+  const { teamsByName: teams } = useTeams(leagueName);
 
   useEffect(() => {
-    if (initialDataLoaded) loadNav(leagueName);
-  }, [initialDataLoaded, loadNav, leagueName]);
+    if (initialDataLoaded) loadTeams(leagueName);
+  }, [initialDataLoaded, leagueName, loadTeams]);
 
-  if (!teams) return <Loader size="large" active={true} />;
+  if (!league || !teams) return <Loader size="large" active={true} />;
 
   return (
     <>
       <MainHeader>
-        <TeamDetail {...teamsByName[teamName]} header={true} />
+        <TeamDetail {...teams[teamName]} header={true} />
       </MainHeader>
       <MainContent>
-        <Grid>
+        {/* <Grid>
           <CardTemplate
             type="teamStandings"
             teams={teams}
@@ -39,7 +41,7 @@ function Team({ initialDataLoaded, loadNav, teams, teamsByName }) {
           />
           <CardTemplate type="teamSchedule" teams={teamsByName} />
           <CardTemplate type="teamForm" teams={teamsByName} />
-        </Grid>
+        </Grid> */}
       </MainContent>
     </>
   );

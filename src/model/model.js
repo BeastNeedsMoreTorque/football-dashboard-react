@@ -2,7 +2,19 @@ import api from "../api/sportDataApi";
 import { LEAGUE_IDS, MAX_TOP_SCORERS } from "../others/config.js";
 import { getLocalDate, formatTeamName } from "../others/helper.js";
 
-const data = {};
+const initialData = {
+  teams: null,
+  teamsByName: null,
+  teamsArr: null,
+  standings: null,
+  matchResults: null,
+  matchResultStatus: "IDLE",
+  matchUpcoming: null,
+  matchUpcomingStatus: "IDLE",
+  topScorers: null,
+};
+
+export const store = {};
 
 export const model = {
   async getLeagues() {
@@ -32,23 +44,17 @@ export const model = {
         countryName: name,
       });
 
-      data[leagueData[i].name] = leagueData[i];
+      store[leagueData[i].name] = { ...leagueData[i], ...initialData };
     });
-
-    return leagueData;
-  },
-
-  getLeague(leagueName) {
-    return data[leagueName];
   },
 
   async getTeams(leagueName) {
-    if (!data[leagueName]) throw new Error("Invalid league name");
+    if (!store[leagueName]) throw new Error("Invalid league name");
 
     const standings = await this.getStandings(leagueName);
     const teamsArr = await Promise.all(
       standings.map(({ team_id }) =>
-        api.getTeam(data[leagueName].league_id, team_id)
+        api.getTeam(store[leagueName].league_id, team_id)
       )
     );
 
@@ -65,27 +71,35 @@ export const model = {
     });
     teamsArr.sort((a, b) => a.name.localeCompare(b.name));
 
-    data[leagueName].teams = teams;
-    return { teams, teamsByName, teamsArr };
+    store[leagueName] = {
+      ...store[leagueName],
+      standings,
+      teams,
+      teamsByName,
+      teamsArr,
+    };
   },
 
   async getStandings(leagueName) {
-    const { league_id, season_id } = data[leagueName];
+    const { league_id, season_id } = store[leagueName];
     const { standings } = await api.getStandings(league_id, season_id);
 
     return standings;
   },
 
   async getMatchResults(leagueName) {
+    if (store[leagueName].matchResultStatus === "FETCHING") return;
     try {
-      const leagueEnded =
-        new Date(Date.now()) > new Date(data[leagueName].end_date);
+      store[leagueName].matchResultStatus = "FETCHING";
 
-      const { league_id, season_id } = data[leagueName];
+      const leagueEnded =
+        new Date(Date.now()) > new Date(store[leagueName].end_date);
+
+      const { league_id, season_id } = store[leagueName];
       const matches = await api.getMatchResults(
         league_id,
         season_id,
-        leagueEnded ? data[leagueName].end_date : new Date(Date.now())
+        leagueEnded ? store[leagueName].end_date : new Date(Date.now())
       );
 
       let filtered = matches.filter(
@@ -100,25 +114,26 @@ export const model = {
         })
         .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
 
-      return matchesSorted;
+      store[leagueName].matchResults = matchesSorted;
+      store[leagueName].matchResultStatus = "UPDATED";
     } catch (err) {
-      switch (err) {
-        case 403:
-          return [];
-        default:
-          console.error(err);
-          return [];
-      }
+      throw new Error(err);
     }
   },
 
   async getMatchUpcoming(leagueName) {
+    if (store[leagueName].matchUpcomingStatus === "FETCHING") return;
     try {
+      store[leagueName].matchUpcomingStatus = "FETCHING";
       const leagueEnded =
-        new Date(Date.now()) > new Date(data[leagueName].end_date);
-      if (leagueEnded) return [];
+        new Date(Date.now()) > new Date(store[leagueName].end_date);
+      if (leagueEnded) {
+        store[leagueName].matchUpcoming = [];
+        store[leagueName].matchUpcomingStatus = "UPDATED";
+        return;
+      }
 
-      const { league_id, season_id } = data[leagueName];
+      const { league_id, season_id } = store[leagueName];
       const matches = await api.getMatchUpcoming(league_id, season_id);
 
       let filtered = matches.filter(
@@ -135,20 +150,15 @@ export const model = {
         })
         .sort((a, b) => new Date(a.match_start) - new Date(b.match_start));
 
-      return matchesSorted;
+      store[leagueName].matchUpcomingStatus = "UPDATED";
+      store[leagueName].matchUpcoming = matchesSorted;
     } catch (err) {
-      switch (err) {
-        case 403:
-          return [];
-        default:
-          console.error(err);
-          return [];
-      }
+      throw new Error(err);
     }
   },
 
   async getTopScorers(leagueName) {
-    const { league_id, season_id } = data[leagueName];
+    const { league_id, season_id } = store[leagueName];
     const topScorers = await api.getTopScorers(league_id, season_id);
 
     // find index
