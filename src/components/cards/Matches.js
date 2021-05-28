@@ -7,7 +7,6 @@ import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
-
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
 import DatePicker from "./date-picker/DatePicker";

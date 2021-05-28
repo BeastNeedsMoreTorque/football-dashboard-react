@@ -1,44 +1,41 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
+import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, getTeamURL } from "../../others/helper";
 import { MAX_FORM_RESULTS } from "../../others/config";
 
 import { Table } from "semantic-ui-react";
-
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
 import ResultStat from "./result-stat/ResultStat";
 
 const propTypes = {
-  teams: PropTypes.object.isRequired,
+  currentLeague: PropTypes.string.isRequired,
+  currentTeam: PropTypes.string.isRequired,
 };
 
-function TeamForm({ teams }) {
-  const [matchData, setMatchData] = useState(null);
-  const { leagueName, teamName } = useNames(useParams());
+function TeamForm({ currentLeague, currentTeam: currentTeamName }) {
+  const [status, setStatus] = useState(useMatchStatus(currentLeague)?.result);
+  const matches = useMatches(currentLeague)?.result;
+  const { teamsByName: teams } = useTeams(currentLeague);
 
   useEffect(() => {
-    let ignore = false;
-    getData();
-
-    return () => (ignore = true);
+    if (status === "IDLE") getData();
 
     async function getData() {
-      const matches = await model.getMatchResults(leagueName);
+      await model.getMatchResults(currentLeague);
 
-      if (!ignore) setMatchData(matches);
+      setStatus("UPDATED");
     }
-  }, [leagueName]);
+  }, [status, currentLeague]);
 
-  if (!matchData) return <CardPlaceholder />;
+  if (!matches || !teams) return <CardPlaceholder />;
 
-  if (!matchData.length)
-    return <h3 style={{ marginTop: "1rem" }}>No Matches</h3>;
+  if (!matches.length)
+    return <h3 style={{ marginTop: "1rem" }}>No Recent Match Results</h3>;
 
   const OpponentRow = [
     <Table.Cell key={0} className="header" width={2} children="Opponent" />,
@@ -54,15 +51,15 @@ function TeamForm({ teams }) {
   let draws = 0;
   let losts = 0;
 
-  matchData
+  matches
     .filter(
       (match) =>
-        formatTeamName(match.home_team.name) === teamName ||
-        formatTeamName(match.away_team.name) === teamName
+        formatTeamName(match.home_team.name) === currentTeamName ||
+        formatTeamName(match.away_team.name) === currentTeamName
     )
     .slice(-MAX_FORM_RESULTS)
     .forEach((match, index) => {
-      const isHome = formatTeamName(match.home_team.name) === teamName;
+      const isHome = formatTeamName(match.home_team.name) === currentTeamName;
       const opponentName = isHome
         ? formatTeamName(match.away_team.name)
         : formatTeamName(match.home_team.name);

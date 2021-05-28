@@ -52,7 +52,11 @@ function League({ initialDataLoaded, loadTeams }) {
             type="matchUpcoming"
             currentLeague={leagueName}
           />
-          {/* <CardTemplate key={`${league.league_id}-top`} type="topScorers" currentLeague={leagueName} /> */}
+          <CardTemplate
+            key={`${league.league_id}-top`}
+            type="topScorers"
+            currentLeague={leagueName}
+          />
         </Grid>
       </MainContent>
     </>

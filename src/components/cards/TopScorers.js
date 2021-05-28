@@ -1,43 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 
 import { model } from "../../model/model";
-import { formatName, formatTeamName, getTeamURL } from "../../others/helper";
+import { useScorersStatus, useScorers, useTeams } from "../../model/selectors";
+import { formatTeamName, formatName, getTeamURL } from "../../others/helper";
+import { MAX_TOP_SCORERS } from "../../others/config";
 
 import { Table } from "semantic-ui-react";
-
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
-import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
 
 const propTypes = {
-  teams: PropTypes.object.isRequired,
+  currentLeague: PropTypes.string.isRequired,
 };
 
-function TopScorers({ teams }) {
-  const [topScorersData, setTopScorersData] = useState(null);
-  const { leagueName } = useNames(useParams());
+function TopScorers({ currentLeague }) {
+  const [status, setStatus] = useState(useScorersStatus(currentLeague));
+  const scorers = useScorers(currentLeague);
+  const { teamsByName: teams } = useTeams(currentLeague);
 
   useEffect(() => {
-    console.log("effect");
-    let ignore = false;
-    if (!topScorersData) {
-      console.log("fetch");
-      getData();
-    }
-
-    return () => (ignore = true);
+    if (status === "IDLE") getData();
 
     async function getData() {
-      const topScorers = await model.getTopScorers(leagueName);
+      await model.getTopScorers(currentLeague);
 
-      if (!ignore) setTopScorersData(topScorers);
+      setStatus("UPDATED");
     }
-  }, [leagueName, topScorersData]);
+  }, [status, currentLeague]);
 
-  if (!topScorersData) return <CardPlaceholder />;
+  if (!scorers || !teams) return <CardPlaceholder />;
 
   return (
     <Table className="top-scorers" celled={true} size="small">
@@ -68,16 +61,16 @@ function TopScorers({ teams }) {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {topScorersData.map((p, i) => {
-          const teamData = teams[formatTeamName(p.team.team_name)];
+        {scorers.slice(0, MAX_TOP_SCORERS).map((p, i) => {
+          const team = teams[formatTeamName(p.team.team_name)];
           return (
             <Table.Row key={i}>
               <Table.Cell>{p.pos}</Table.Cell>
               <Table.Cell
                 className="team-cell"
                 children={
-                  <Link to={getTeamURL({ ...teamData })}>
-                    <TeamDetail {...teamData} displayCode={true} />
+                  <Link to={getTeamURL({ ...team })}>
+                    <TeamDetail {...team} displayCode={true} />
                   </Link>
                 }
               />

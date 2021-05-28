@@ -1,46 +1,30 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
 
-import { model } from "../../model/model";
+import { useTeams, useStandings } from "../../model/selectors";
 import { getTeamURL } from "../../others/helper";
 
 import { Ref, Table } from "semantic-ui-react";
-
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
 
 const propTypes = {
-  teams: PropTypes.object.isRequired,
-  teamsByName: PropTypes.object.isRequired,
+  currentLeague: PropTypes.string.isRequired,
+  currentTeam: PropTypes.string.isRequired,
 };
 
 // prettier-ignore
 const config = { tableHeader: ["#", "Team", "Points", "Diff", "Played", "W", "D", "L"] };
 
-function TeamStanding({ teams, teamsByName }) {
-  const [standingsData, setStandingsData] = useState(null);
-  const { leagueName, teamName } = useNames(useParams());
+function TeamStanding({ currentLeague, currentTeam: currentTeamName }) {
+  const standings = useStandings(currentLeague);
+  const { teams, teamsByName } = useTeams(currentLeague);
 
-  const currentTeam = standingsData?.filter(
-    (team) => team.team_id === teamsByName[teamName].team_id
-  )[0];
+  const currentTeam = standings?.find(
+    (team) => team.team_id === teamsByName[currentTeamName].team_id
+  );
   const currentRef = useRef(null);
-
-  useEffect(() => {
-    let ignore = false;
-    getData();
-
-    return () => (ignore = true);
-
-    async function getData() {
-      const standings = await model.getStandings(leagueName);
-
-      if (!ignore) setStandingsData(standings);
-    }
-  }, [leagueName]);
 
   useEffect(() => {
     if (currentTeam) {
@@ -50,7 +34,7 @@ function TeamStanding({ teams, teamsByName }) {
     }
   }, [currentTeam]);
 
-  if (!standingsData || !currentTeam) return <CardPlaceholder />;
+  if (!standings || !currentTeam) return <CardPlaceholder />;
 
   return (
     <div className="team-standing">
@@ -63,7 +47,7 @@ function TeamStanding({ teams, teamsByName }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {standingsData.map((team, i) => (
+          {standings.map((team, i) => (
             <Ref key={i} innerRef={team === currentTeam ? currentRef : null}>
               <Table.Row className={team === currentTeam ? "current" : null}>
                 <Table.Cell>{team.position}</Table.Cell>

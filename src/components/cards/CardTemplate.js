@@ -16,6 +16,7 @@ import TeamForm from "./TeamForm";
 const propTypes = {
   type: PropTypes.string.isRequired,
   currentLeague: PropTypes.string.isRequired,
+  currentTeam: PropTypes.string,
 };
 
 export const style = {
@@ -85,7 +86,7 @@ const cardConfig = {
   },
 };
 
-function CardTemplate({ type, currentLeague }) {
+function CardTemplate({ type, currentLeague, currentTeam }) {
   const { width, title, subType, Content } = cardConfig[type];
 
   return (
@@ -96,7 +97,11 @@ function CardTemplate({ type, currentLeague }) {
             <h3>{title}</h3>
           </Card.Header>
           <Card.Description style={style.cardDescription}>
-            <Content subType={subType} currentLeague={currentLeague} />
+            <Content
+              subType={subType}
+              currentLeague={currentLeague}
+              currentTeam={currentTeam}
+            />
           </Card.Description>
         </Card.Content>
       </Card>

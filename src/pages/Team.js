@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
+import { getNames } from "../others/helper";
+
 import { useLeague, useTeams } from "../model/selectors";
 
 import MainHeader from "../components/UI/MainHeader";
@@ -8,8 +10,6 @@ import MainContent from "../components/UI/MainContent";
 import TeamDetail from "../components/team-detail/TeamDetail";
 import CardTemplate from "../components/cards/CardTemplate";
 import { Grid, Loader } from "semantic-ui-react";
-
-import { getNames } from "../others/helper";
 
 const propTypes = {
   initialDataLoaded: PropTypes.bool.isRequired,
@@ -27,21 +27,34 @@ function Team({ initialDataLoaded, loadTeams }) {
 
   if (!league || !teams) return <Loader size="large" active={true} />;
 
+  const currentTeam = teams[teamName];
+
   return (
     <>
       <MainHeader>
-        <TeamDetail {...teams[teamName]} header={true} />
+        <TeamDetail {...currentTeam} header={true} />
       </MainHeader>
       <MainContent>
-        {/* <Grid>
+        <Grid>
           <CardTemplate
+            key={`${currentTeam.team_id}-teamStandings`}
             type="teamStandings"
-            teams={teams}
-            teamsByName={teamsByName}
+            currentLeague={leagueName}
+            currentTeam={teamName}
           />
-          <CardTemplate type="teamSchedule" teams={teamsByName} />
-          <CardTemplate type="teamForm" teams={teamsByName} />
-        </Grid> */}
+          <CardTemplate
+            key={`${currentTeam.team_id}-schedule`}
+            type="teamSchedule"
+            currentLeague={leagueName}
+            currentTeam={teamName}
+          />
+          <CardTemplate
+            key={`${currentTeam.team_id}-form`}
+            type="teamForm"
+            currentLeague={leagueName}
+            currentTeam={teamName}
+          />
+        </Grid>
       </MainContent>
     </>
   );

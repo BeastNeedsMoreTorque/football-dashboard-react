@@ -1,46 +1,42 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { useNames } from "../../hooks/useNames";
 
 import { model } from "../../model/model";
+import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, formatDate, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
-
 import TeamDetail from "../team-detail/TeamDetail";
 import CardPlaceholder from "./CardPlaceholder";
 
 const propTypes = {
-  teams: PropTypes.object.isRequired,
+  currentLeague: PropTypes.string.isRequired,
+  currentTeam: PropTypes.string.isRequired,
 };
 
 const config = {
   tableHeader: ["Schedule", "Opponent"],
 };
 
-function TeamSchedule({ teams }) {
-  const [matchData, setMatchData] = useState(null);
-  const { leagueName, teamName } = useNames(useParams());
+function TeamSchedule({ currentLeague, currentTeam: currentTeamName }) {
+  const [status, setStatus] = useState(useMatchStatus(currentLeague)?.upcoming);
+  const matches = useMatches(currentLeague)?.upcoming;
+  const { teamsByName: teams } = useTeams(currentLeague);
 
   useEffect(() => {
-    let ignore = false;
-    getData();
-
-    return () => (ignore = true);
+    if (status === "IDLE") getData();
 
     async function getData() {
-      const matches = await model.getMatchUpcoming(leagueName);
+      await model.getMatchUpcoming(currentLeague);
 
-      if (!ignore) setMatchData(matches);
+      setStatus("UPDATED");
     }
-  }, [leagueName]);
+  }, [status, currentLeague]);
 
-  if (!matchData) return <CardPlaceholder />;
+  if (!matches || !teams) return <CardPlaceholder />;
 
-  if (!matchData.length)
-    return <h3 style={{ marginTop: "1rem" }}>No Matches</h3>;
+  if (!matches.length) return <h3 style={{ marginTop: "1rem" }}>No Matches</h3>;
 
   return (
     <div className="team-schedule">
@@ -53,14 +49,15 @@ function TeamSchedule({ teams }) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {matchData
+          {matches
             .filter(
               (match) =>
-                formatTeamName(match.home_team.name) === teamName ||
-                formatTeamName(match.away_team.name) === teamName
+                formatTeamName(match.home_team.name) === currentTeamName ||
+                formatTeamName(match.away_team.name) === currentTeamName
             )
             .map((match, i) => {
-              const isHome = formatTeamName(match.home_team.name) === teamName;
+              const isHome =
+                formatTeamName(match.home_team.name) === currentTeamName;
               const opponentName = isHome
                 ? formatTeamName(match.away_team.name)
                 : formatTeamName(match.home_team.name);

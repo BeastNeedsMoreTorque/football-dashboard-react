@@ -1,5 +1,5 @@
 import api from "../api/sportDataApi";
-import { LEAGUE_IDS, MAX_TOP_SCORERS } from "../others/config.js";
+import { LEAGUE_IDS } from "../others/config.js";
 import { getLocalDate, formatTeamName } from "../others/helper.js";
 
 const initialData = {
@@ -12,6 +12,7 @@ const initialData = {
   matchUpcoming: null,
   matchUpcomingStatus: "IDLE",
   topScorers: null,
+  topScorersStatus: "IDLE",
 };
 
 export const store = {};
@@ -158,17 +159,16 @@ export const model = {
   },
 
   async getTopScorers(leagueName) {
-    const { league_id, season_id } = store[leagueName];
-    const topScorers = await api.getTopScorers(league_id, season_id);
+    if (store[leagueName].topScorersStatus === "FETCHING") return;
+    try {
+      store[leagueName].topScorersStatus = "FETCHING";
+      const { league_id, season_id } = store[leagueName];
+      const topScorers = await api.getTopScorers(league_id, season_id);
 
-    // find index
-    let index = 0;
-    for (const player of topScorers) {
-      if (player.goals.overall < topScorers[MAX_TOP_SCORERS - 1].goals.overall)
-        break;
-      index++;
+      store[leagueName].topScorersStatus = "UPDATED";
+      store[leagueName].topScorers = topScorers;
+    } catch (err) {
+      throw new Error(err);
     }
-
-    return topScorers.slice(0, index);
   },
 };

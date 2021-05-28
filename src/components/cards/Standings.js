@@ -2,12 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import { Table } from "semantic-ui-react";
+import { useTeams, useStandings } from "../../model/selectors";
 import { getTeamURL } from "../../others/helper";
 
+import { Table } from "semantic-ui-react";
 import CardPlaceholder from "./CardPlaceholder";
 import TeamDetail from "../team-detail/TeamDetail";
-import { useTeams, useStandings } from "../../model/selectors";
 
 const propTypes = { currentLeague: PropTypes.string.isRequired };
 

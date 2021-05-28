@@ -44,3 +44,15 @@ export const useMatches = function (leagueName) {
 
   return { result, upcoming };
 };
+
+export const useScorersStatus = function (leagueName) {
+  if (!leagueName || !store[leagueName]) return null;
+
+  return store[leagueName].topScorersStatus;
+};
+
+export const useScorers = function (leagueName) {
+  if (!leagueName || !store[leagueName]) return null;
+
+  return store[leagueName].topScorers;
+};
