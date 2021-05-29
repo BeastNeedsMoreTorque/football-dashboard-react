@@ -14,9 +14,11 @@ import { Grid, Loader } from "semantic-ui-react";
 const propTypes = {
   initialDataLoaded: PropTypes.bool.isRequired,
   loadTeams: PropTypes.func.isRequired,
+  customs: PropTypes.array.isRequired,
+  onCardSelect: PropTypes.func.isRequired,
 };
 
-function League({ initialDataLoaded, loadTeams }) {
+function League({ initialDataLoaded, loadTeams, customs, onCardSelect }) {
   const { leagueName } = getNames(useParams());
   const league = useLeague(leagueName);
 
@@ -24,7 +26,7 @@ function League({ initialDataLoaded, loadTeams }) {
     if (initialDataLoaded) loadTeams(leagueName);
   }, [initialDataLoaded, leagueName, loadTeams]);
 
-  if (!league) return <Loader size="large" active={true} />;
+  if (!initialDataLoaded) return <Loader size="large" active={true} />;
 
   return (
     <>
@@ -41,21 +43,29 @@ function League({ initialDataLoaded, loadTeams }) {
             key={`${league.league_id}-standings`}
             type="standings"
             currentLeague={leagueName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
           <CardTemplate
             key={`${league.league_id}-result`}
             type="matchResult"
             currentLeague={leagueName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
           <CardTemplate
             key={`${league.league_id}-upcoming`}
             type="matchUpcoming"
             currentLeague={leagueName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
           <CardTemplate
             key={`${league.league_id}-top`}
             type="topScorers"
             currentLeague={leagueName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
         </Grid>
       </MainContent>

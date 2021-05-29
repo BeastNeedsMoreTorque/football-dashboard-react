@@ -71,3 +71,7 @@ export const getNames = function (params) {
     teamName: teamName?.replaceAll("-", " "),
   };
 };
+
+export const getCardKey = function ({ type, currentLeague, currentTeam }) {
+  return `${currentLeague}-${currentTeam || ""}-${type}`;
+};

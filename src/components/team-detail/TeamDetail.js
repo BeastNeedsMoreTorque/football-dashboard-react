@@ -7,7 +7,6 @@ const propTypes = {
   name: PropTypes.string.isRequired,
   displayCode: PropTypes.bool,
   header: PropTypes.bool,
-  style: PropTypes.object,
 };
 
 const defaultProps = { displayCode: false, header: false, style: {} };
@@ -20,16 +19,9 @@ const style = {
   headerLogo: { width: "2rem", marginRight: "1.5rem" },
 };
 
-function TeamDetail({
-  logo,
-  short_code,
-  name,
-  displayCode,
-  header,
-  style: addStyle,
-}) {
+function TeamDetail({ logo, short_code, name, displayCode, header }) {
   return (
-    <div style={{ ...style.root, ...addStyle }}>
+    <div style={style.root}>
       <img
         style={header ? style.headerLogo : style.teamLogo}
         src={logo}

@@ -7,7 +7,7 @@ function Sidebar(props) {
   return (
     <aside
       className="sidebar"
-      style={props.editMode ? { opacity: "0.7", pointerEvents: "none" } : {}}
+      style={props.editMode ? { opacity: "0.7", pointerEvents: "none" } : null}
     >
       {props.children}
     </aside>

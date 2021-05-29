@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { getNames } from "../others/helper";
 
-import { useLeague, useTeams } from "../model/selectors";
+import { useTeams } from "../model/selectors";
 
 import MainHeader from "../components/UI/MainHeader";
 import MainContent from "../components/UI/MainContent";
@@ -14,18 +14,20 @@ import { Grid, Loader } from "semantic-ui-react";
 const propTypes = {
   initialDataLoaded: PropTypes.bool.isRequired,
   loadTeams: PropTypes.func.isRequired,
+  customs: PropTypes.array.isRequired,
+  onCardSelect: PropTypes.func.isRequired,
 };
 
-function Team({ initialDataLoaded, loadTeams }) {
+function Team({ initialDataLoaded, loadTeams, customs, onCardSelect }) {
   const { leagueName, teamName } = getNames(useParams());
-  const league = useLeague(leagueName);
   const { teamsByName: teams } = useTeams(leagueName);
 
   useEffect(() => {
     if (initialDataLoaded) loadTeams(leagueName);
   }, [initialDataLoaded, leagueName, loadTeams]);
 
-  if (!league || !teams) return <Loader size="large" active={true} />;
+  if (!initialDataLoaded || !teams)
+    return <Loader size="large" active={true} />;
 
   const currentTeam = teams[teamName];
 
@@ -41,18 +43,24 @@ function Team({ initialDataLoaded, loadTeams }) {
             type="teamStandings"
             currentLeague={leagueName}
             currentTeam={teamName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
           <CardTemplate
             key={`${currentTeam.team_id}-schedule`}
             type="teamSchedule"
             currentLeague={leagueName}
             currentTeam={teamName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
           <CardTemplate
             key={`${currentTeam.team_id}-form`}
             type="teamForm"
             currentLeague={leagueName}
             currentTeam={teamName}
+            customs={customs}
+            onCardSelect={onCardSelect}
           />
         </Grid>
       </MainContent>
