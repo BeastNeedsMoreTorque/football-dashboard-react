@@ -49,6 +49,7 @@ class App extends React.Component {
   }
 
   loadTeams = async (...leagueNames) => {
+    if (this.state.editMode) return;
     if (!leagueNames.length) return;
 
     this.setState({
@@ -96,9 +97,9 @@ class App extends React.Component {
 
   onMoveClick = (direction) => {
     const nextCustom = [...this.state.customs];
-    const willMove = [
-      ...this.state.customs.filter((key) => this.state.selected.includes(key)),
-    ];
+    const willMove = this.state.customs.filter((key) =>
+      this.state.selected.includes(key)
+    );
     if (direction === "right") willMove.reverse();
 
     willMove.forEach((key) => {

@@ -25,10 +25,13 @@ function TeamForm({ currentLeague, currentTeam: currentTeamName }) {
   useEffect(() => {
     if (status === "IDLE") getData();
 
+    // Unmount || Updated
+    return () => setStatus("DONE");
+
     async function getData() {
       await model.getMatchResults(currentLeague);
 
-      setStatus("UPDATED");
+      if (status !== "DONE") setStatus("UPDATED");
     }
   }, [status, currentLeague]);
 

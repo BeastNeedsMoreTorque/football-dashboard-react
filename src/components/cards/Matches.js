@@ -40,12 +40,15 @@ function Matches({ subType, currentLeague }) {
   useEffect(() => {
     if (status === "IDLE") getData();
 
+    // Unmount || Updated
+    return () => setStatus("DONE");
+
     async function getData() {
       subType === "result"
         ? await model.getMatchResults(currentLeague)
         : await model.getMatchUpcoming(currentLeague);
 
-      setStatus("UPDATED");
+      if (status !== "DONE") setStatus("UPDATED");
     }
   }, [subType, status, currentLeague]);
 

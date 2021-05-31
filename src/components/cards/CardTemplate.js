@@ -48,9 +48,6 @@ export const style = {
     marginTop: "1.2rem",
     overflowY: "hidden",
   },
-  editModeSelected: {
-    opacity: "1 !important",
-  },
 };
 
 const cardConfig = {

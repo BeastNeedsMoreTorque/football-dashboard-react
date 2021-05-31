@@ -38,24 +38,6 @@ export const formatDate = function (dateStr) {
   }).format(date);
 };
 
-export const generateKey = function ({
-  type,
-  subType,
-  leagueId,
-  seasonId,
-  teamId,
-  teamCode,
-}) {
-  let key = `${type} ${leagueId} ${seasonId}`;
-  if (subType) key += " " + subType;
-  if (teamId) {
-    key += " " + teamId;
-    key += " " + teamCode;
-  }
-
-  return key;
-};
-
 export const getTeamURL = function ({ leagueName, name }) {
   return `/team/${leagueName.replaceAll(" ", "-")}/${name.replaceAll(
     " ",

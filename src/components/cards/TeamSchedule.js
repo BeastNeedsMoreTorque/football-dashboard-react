@@ -27,10 +27,13 @@ function TeamSchedule({ currentLeague, currentTeam: currentTeamName }) {
   useEffect(() => {
     if (status === "IDLE") getData();
 
+    // Unmount || Updated
+    return () => setStatus("DONE");
+
     async function getData() {
       await model.getMatchUpcoming(currentLeague);
 
-      setStatus("UPDATED");
+      if (status !== "DONE") setStatus("UPDATED");
     }
   }, [status, currentLeague]);
 
