@@ -1,7 +1,6 @@
 # ⚽ Football Dashboard - React
 
 - Rebuilding [Football Dashboard](https://github.com/sanginchun/football-dashboard) in react.
-- 🚧 Refactoring 🚧
 
 ## Table of Contents
 
@@ -24,27 +23,55 @@
 
 ## Live Demo
 
-- 🚧 Refactoring 🚧
-- Please visit other versions to see DEMO
+- [https://football-dashboard-react.netlify.app/](https://football-dashboard-react.netlify.app/)
 
 ## Improvements
+- Render logic
+  - Vanilla JS (Before): Explicitly rendered placeholders on click, get data from model, then called each commponents' render method.
+  - React (Now): Managed `currentLeague(Team)`, `(data)`, `(data)Status` and more as state, rendered when state changes.
+  - Lots of responsibilities(and codes) in `App.js` split to page components, each cards.
+  
+- Router
+  - Used react-router-dom
+  - Descriptive URL
+  - Created 'page components'; Readable composition structure in `App.js`
+  <br>
+  
+  ```jsx
+  return (
+    <div className="app">
+      <Sidebar>
+        <MainLogo />
+        <MainNav />
+      </Sidebar>
+      <MainDisplay>
+        <Switch>
+          <Route path="/custom">
+            <Custom />
+          </Route>
+          <Route path="/league/:leagueName">
+            <League />
+          </Route>
+          <Route path="/team/:leagueName/:teamName">
+            <Team />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </MainDisplay>
+    </div>
+  );
+  ```
 
 - Used [semantic ui](https://react.semantic-ui.com/) for more readable, clear UI.
-
   - Before
     ![ui_before](https://user-images.githubusercontent.com/31500012/113542135-97820d00-961e-11eb-96bf-0b6af8c27d3a.png)
-
-  - After
+  - Now
     ![ui_after](https://user-images.githubusercontent.com/31500012/113541915-1e82b580-961e-11eb-9f8a-9444313b4362.png)
 
-- Making components reusable
-  - [TeamDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/team-detail/TeamDetail.js) </br>
-    ![team_detail](https://user-images.githubusercontent.com/31500012/113542674-be8d0e80-961f-11eb-9449-2f2f20cb04b5.png)
-  - [LeagueDetail.js](https://github.com/sanginchun/football-dashboard-react/blob/master/src/components/league-detail/LeagueDetail.js)
-- Refactoring using Router
+- Changed directory structure; Less nested, based on each component's functionalities.
 
 ## To be updated
-
-- Router (🚧 Working on)
-- Managing users
-- Multiple custom pages
+- Mobile View
+- Redux
