@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import { model } from "../../model/model";
-import { useScorersStatus, useScorers, useTeams } from "../../model/selectors";
+import { useTopScorers, useTeams } from "../../model/selectors";
 import { formatTeamName, formatName, getTeamURL } from "../../others/helper";
 import { MAX_TOP_SCORERS } from "../../others/config";
 
@@ -16,24 +15,10 @@ const propTypes = {
 };
 
 function TopScorers({ currentLeague }) {
-  const [status, setStatus] = useState(useScorersStatus(currentLeague));
-  const scorers = useScorers(currentLeague);
+  const topScorers = useTopScorers(currentLeague);
   const { teamsByName: teams } = useTeams(currentLeague);
 
-  useEffect(() => {
-    if (status === "IDLE") getData();
-
-    // Unmount || Updated
-    return () => setStatus("DONE");
-
-    async function getData() {
-      await model.getTopScorers(currentLeague);
-
-      if (status !== "DONE") setStatus("UPDATED");
-    }
-  }, [status, currentLeague]);
-
-  if (!scorers || !teams) return <CardPlaceholder />;
+  if (!topScorers || !teams) return <CardPlaceholder />;
 
   return (
     <Table className="top-scorers" celled={true} size="small">
@@ -64,7 +49,7 @@ function TopScorers({ currentLeague }) {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {scorers.slice(0, MAX_TOP_SCORERS).map((p, i) => {
+        {topScorers.slice(0, MAX_TOP_SCORERS).map((p, i) => {
           const team = teams[formatTeamName(p.team.team_name)];
           return (
             <Table.Row key={i}>

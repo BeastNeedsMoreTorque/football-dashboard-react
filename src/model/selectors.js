@@ -61,14 +61,21 @@ export const useMatches = function (leagueName, subType) {
   return matches;
 };
 
-export const useScorersStatus = function (leagueName) {
-  if (!leagueName || !store[leagueName]) return null;
+export const useTopScorers = function (leagueName) {
+  const status = store[leagueName].topScorersStatus;
+  const [topScorers, setTopScorers] = useState(store[leagueName].topScorers);
 
-  return store[leagueName].topScorersStatus;
-};
+  useEffect(() => {
+    if (status === "IDLE") getData();
 
-export const useScorers = function (leagueName) {
-  if (!leagueName || !store[leagueName]) return null;
+    async function getData() {
+      await model.getTopScorers(leagueName);
 
-  return store[leagueName].topScorers;
+      if (status !== "UPDATED") {
+        setTopScorers(store[leagueName].topScorers);
+      }
+    }
+  }, [status, leagueName]);
+
+  return topScorers;
 };
