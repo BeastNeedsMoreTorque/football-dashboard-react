@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import { model } from "../../model/model";
-import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
+import { useTeams, useMatches } from "../../model/selectors";
 import { formatTeamName, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
@@ -29,28 +28,9 @@ const getUniqueDates = function (dateArr, subType) {
 };
 
 function Matches({ subType, currentLeague }) {
-  const [status, setStatus] = useState(
-    useMatchStatus(currentLeague)?.[subType]
-  );
-  const matches = useMatches(currentLeague)?.[subType];
+  const matches = useMatches(currentLeague, subType);
   const { teamsByName: teams } = useTeams(currentLeague);
-
   const [date, setDate] = useState("");
-
-  useEffect(() => {
-    if (status === "IDLE") getData();
-
-    // Unmount || Updated
-    return () => setStatus("DONE");
-
-    async function getData() {
-      subType === "result"
-        ? await model.getMatchResults(currentLeague)
-        : await model.getMatchUpcoming(currentLeague);
-
-      if (status !== "DONE") setStatus("UPDATED");
-    }
-  }, [subType, status, currentLeague]);
 
   useEffect(() => {
     if (matches?.length) {

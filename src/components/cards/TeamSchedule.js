@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import { model } from "../../model/model";
-import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
+import { useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, formatDate, getTeamURL } from "../../others/helper";
 
 import { Table } from "semantic-ui-react";
@@ -20,22 +19,8 @@ const config = {
 };
 
 function TeamSchedule({ currentLeague, currentTeam: currentTeamName }) {
-  const [status, setStatus] = useState(useMatchStatus(currentLeague)?.upcoming);
-  const matches = useMatches(currentLeague)?.upcoming;
+  const matches = useMatches(currentLeague, "upcoming");
   const { teamsByName: teams } = useTeams(currentLeague);
-
-  useEffect(() => {
-    if (status === "IDLE") getData();
-
-    // Unmount || Updated
-    return () => setStatus("DONE");
-
-    async function getData() {
-      await model.getMatchUpcoming(currentLeague);
-
-      if (status !== "DONE") setStatus("UPDATED");
-    }
-  }, [status, currentLeague]);
 
   if (!matches || !teams) return <CardPlaceholder />;
 

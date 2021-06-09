@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import { model } from "../../model/model";
-import { useMatchStatus, useMatches, useTeams } from "../../model/selectors";
+import { useMatches, useTeams } from "../../model/selectors";
 import { formatTeamName, getTeamURL } from "../../others/helper";
 import { MAX_FORM_RESULTS } from "../../others/config";
 
@@ -18,22 +17,8 @@ const propTypes = {
 };
 
 function TeamForm({ currentLeague, currentTeam: currentTeamName }) {
-  const [status, setStatus] = useState(useMatchStatus(currentLeague)?.result);
-  const matches = useMatches(currentLeague)?.result;
+  const matches = useMatches(currentLeague, "result");
   const { teamsByName: teams } = useTeams(currentLeague);
-
-  useEffect(() => {
-    if (status === "IDLE") getData();
-
-    // Unmount || Updated
-    return () => setStatus("DONE");
-
-    async function getData() {
-      await model.getMatchResults(currentLeague);
-
-      if (status !== "DONE") setStatus("UPDATED");
-    }
-  }, [status, currentLeague]);
 
   if (!matches || !teams) return <CardPlaceholder />;
 

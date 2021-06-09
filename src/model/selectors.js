@@ -1,4 +1,5 @@
-import { store } from "./model";
+import { useState, useEffect } from "react";
+import { model, store } from "./model";
 
 export const useLeagues = function () {
   return Object.values(store);
@@ -27,22 +28,37 @@ export const useStandings = function (leagueName) {
   return store[leagueName].standings;
 };
 
-export const useMatchStatus = function (leagueName) {
-  if (!leagueName || !store[leagueName]) return null;
+export const useMatches = function (leagueName, subType) {
+  const status =
+    subType === "result"
+      ? store[leagueName].matchResultStatus
+      : store[leagueName].matchUpcomingStatus;
 
-  const result = store[leagueName].matchResultStatus;
-  const upcoming = store[leagueName].matchUpcomingStatus;
+  const [matches, setMatches] = useState(
+    subType === "result"
+      ? store[leagueName].matchResults
+      : store[leagueName].matchUpcoming
+  );
 
-  return { result, upcoming };
-};
+  useEffect(() => {
+    if (status === "IDLE") getData();
 
-export const useMatches = function (leagueName) {
-  if (!leagueName || !store[leagueName]) return null;
+    async function getData() {
+      subType === "result"
+        ? await model.getMatchResults(leagueName)
+        : await model.getMatchUpcoming(leagueName);
 
-  const result = store[leagueName].matchResults;
-  const upcoming = store[leagueName].matchUpcoming;
+      if (status !== "UPDATED") {
+        setMatches(
+          subType === "result"
+            ? store[leagueName].matchResults
+            : store[leagueName].matchUpcoming
+        );
+      }
+    }
+  }, [subType, status, leagueName]);
 
-  return { result, upcoming };
+  return matches;
 };
 
 export const useScorersStatus = function (leagueName) {
