@@ -41,14 +41,17 @@ export const useMatches = function (leagueName, subType) {
   );
 
   useEffect(() => {
+    let ignore = false;
     if (status === "IDLE") getData();
+
+    return () => (ignore = true);
 
     async function getData() {
       subType === "result"
         ? await model.getMatchResults(leagueName)
         : await model.getMatchUpcoming(leagueName);
 
-      if (status !== "UPDATED") {
+      if (!ignore) {
         setMatches(
           subType === "result"
             ? store[leagueName].matchResults
@@ -66,12 +69,15 @@ export const useTopScorers = function (leagueName) {
   const [topScorers, setTopScorers] = useState(store[leagueName].topScorers);
 
   useEffect(() => {
+    let ignore = false;
     if (status === "IDLE") getData();
+
+    return () => (ignore = true);
 
     async function getData() {
       await model.getTopScorers(leagueName);
 
-      if (status !== "UPDATED") {
+      if (!ignore) {
         setTopScorers(store[leagueName].topScorers);
       }
     }
